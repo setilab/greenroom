@@ -1,0 +1,6 @@
+#!/bin/sh
+
+cp 99-input.rules /etc/udev/rules.d
+cp temperature_controller_init /usr/bin/
+
+chmod 755  /usr/bin/temperature_controller_init

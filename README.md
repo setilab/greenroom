@@ -32,6 +32,9 @@ Register a controller:
 List controller 0 configuration:
 	curl http://localhost:8080/controllers/0
 
+Fetch current temperature from controller 0:
+	curl http://localhost:8080/controllers/0/temp
+
 List all settings from controller 0 or 1:
 	curl http://localhost:8080/controllers/0/settings
 	curl http://localhost:8080/controllers/1/settings
@@ -68,33 +71,33 @@ Client Examples
 ---------------
 
 Fetches the current temp:
-	gr-client.py 
+	grclient.py 
 
 Applies any changed settings:
-	gr-client.py apply
+	grclient.py apply
 
 Fetches current settings:
-	gr-client.py get settings
+	grclient.py get settings
 
 Displays current relay states:
-	gr-client.py get status
+	grclient.py get status
 
 Set cool offset in degrees:
-	gr-client.py set cool offset 1
+	grclient.py set cool offset 1
 
 Set cool offset in degrees:
-	gr-client.py set heat offset 2
+	grclient.py set heat offset 2
 
 Set cool or heat in degrees:
-	gr-client.py set cool to 68
-	gr-client.py set heat to 64
+	grclient.py set cool to 68
+	grclient.py set heat to 64
 
 Change the temperature scale from Celcius to Fahrenheit or vice versa:
-	gr-client.py set temp scale c
-	gr-client.py set temp scale f
+	grclient.py set temp scale c
+	grclient.py set temp scale f
 
 Shutdown the server process:
-	gr-client.py shutdown
+	grclient.py shutdown
 
 
 Utilities

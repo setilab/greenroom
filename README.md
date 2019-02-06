@@ -20,26 +20,33 @@ API Examples
 ------------
 
 List registered controllers:
+
 	curl http://localhost:8080/controllers
 
 List only the controller IDs:
+
 	curl http://localhost:8080/controllers/ids
 
 Register a controller:
+
 	curl http://localhost:8080/controllers/register --data-urlencode "name=controller1" \
 							--data-urlencode "host=localhost" \
 							--data-urlencode "port=12000"
 List controller 0 configuration:
+
 	curl http://localhost:8080/controllers/0
 
 Fetch current temperature from controller 0:
+
 	curl http://localhost:8080/controllers/0/temp
 
 List all settings from controller 0 or 1:
+
 	curl http://localhost:8080/controllers/0/settings
 	curl http://localhost:8080/controllers/1/settings
 
 Update a setting on controller 0:
+
 	curl http://localhost:8080/controllers/0/settings/cool_offset --data-urlencode "setTo=5"
 	curl http://localhost:8080/controllers/0/settings/cool_start_delay --data-urlencode "setTo=15"
 	curl http://localhost:8080/controllers/0/settings/cool_start_delay --data-urlencode "setTo=30"
@@ -51,17 +58,21 @@ Update a setting on controller 0:
 	curl http://localhost:8080/controllers/0/settings/tc_start_delay --date-urlencode "setTo=15"
 
 Save configuration and settings to file:
+
 	curl http://localhost:8080/controllers/0/save -d save 
 
 Shutdown the server running on controller 0:
+
 	curl http://localhost:8080/controllers/0/shutdown -d shutdown
 
 	NOTE: This will also unregister the server from the API.
 
 Display the current relay states:
+
 	curl http://localhost:8080/controllers/0/status
 
 Unregister controller 0:
+
 	curl http://localhost:8080/controllers/0/unregister --data-urlencode "name=controller1"
 
 	NOTE: This doesn't shutdown the server process, rather only removes it from the API.

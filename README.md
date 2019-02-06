@@ -1,9 +1,8 @@
 Welcome to the Greenroom Control System!
 
-This package, and the code within, are part of a real-life proof-of-concept solution for controlling greenhouse fans and heaters.
-The solution is supported by two discrete services. The first is an API that acts as a master control unit, and one or more temperature controllers.
-Each controller consists of a Raspberry Pi B with a Robogaia Temperature Control Plane pi-HAT attached. Every controller runs a TCP socket server to listen for remote commands.
-These remote commands can come from either the API, or the CLI client utility, and are used to alter the runtime or even persistent settings and configs for the controllers.
+This package, and the code within, are part of a real-life proof-of-concept solution for controlling greenhouse fans and heaters. The solution is supported by two discrete services. The first is an API that acts as a master control unit, and one or more temperature controllers.
+
+Each controller consists of a Raspberry Pi B with a Robogaia Temperature Control Plane pi-HAT attached. Every controller runs a TCP socket server to listen for remote commands. These remote commands can come from either the API, or the CLI client utility, and are used to alter the runtime or even persistent settings and configs for the controllers.
 
 To get started...
 

@@ -82,36 +82,45 @@ Client Examples
 ---------------
 
 Fetches the current temp:
+
 	grclient.py 
 
 Applies any changed settings:
+
 	grclient.py apply
 
 Fetches current settings:
+
 	grclient.py get settings
 
 Displays current relay states:
+
 	grclient.py get status
 
 Set cool offset in degrees:
+
 	grclient.py set cool offset 1
 
 Set cool offset in degrees:
+
 	grclient.py set heat offset 2
 
 Set cool or heat in degrees:
+
 	grclient.py set cool to 68
 	grclient.py set heat to 64
 
 Change the temperature scale from Celcius to Fahrenheit or vice versa:
+
 	grclient.py set temp scale c
 	grclient.py set temp scale f
 
 Shutdown the server process:
+
 	grclient.py shutdown
 
 
 Utilities
 ---------
 
-There are a collection of shell scripts located in the utils folder. These scripts do much of what the server is capable of providing, but from the command line. They were provided as part of the source package from which this package was derived.
+There are a collection of shell scripts located in the utils folder. These scripts do much of what the server is capable of providing, but discretely from the command line. They were provided as part of the source package from which this package was derived.

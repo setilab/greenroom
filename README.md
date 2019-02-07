@@ -1,8 +1,10 @@
 Welcome to the Greenroom Control System!
 
-This package, and the code within, are part of a real-life proof-of-concept solution for controlling greenhouse fans and heaters. The solution is supported by two discrete services. The first is an API that acts as a master control unit, and one or more temperature controllers.
+This package, and the code within, are part of a real-life proof-of-concept solution for controlling greenroom or greenhouse fans and heaters. The solution is supported by two discrete services, one of which is a REST API that acts as a master control unit. The other service is made up of one or more temperature controllers.
 
 Each controller consists of a Raspberry Pi B with a Robogaia Temperature Control Plane pi-HAT attached. Every controller runs a TCP socket server to listen for remote commands. These remote commands can come from either the API, or the CLI client utility, and are used to alter the runtime or even persistent settings and configs for the controllers.
+
+The CLI client is designed to run locally on a controller. The REST API can be hosted in several ways. Old school, just run it on a separate rPI. You can also create a container image, and host it as a container on an rPI running Docker. OR...host it on a rPI Kubernetes Cluster!
 
 To get started...
 
@@ -13,6 +15,8 @@ Installation
 2. The server process uses a configuration file, config.json for persistent parameters and settings. You can edit this file and set your own parameters and initialization settings. Most of them are pretty self-explanatory, and don't need to be changed initially. You will want to make sure the api_url points to the correct url for which your api is servicing.
 
 3. The API must start up first, followed by one or more servers (controllers). This is so the servers can register to the API with their name, IP, and port. Both the API and server process can be run on the same controller unit, if desired.
+
+4. Use the included Dockerfile to build a container image. Then you can use the grapi.yml file to create a Kubernetes deployment.
 
 
 API Examples
@@ -123,3 +127,9 @@ Utilities
 ---------
 
 There are a collection of shell scripts located in the utils folder. These scripts do much of what the server is capable of providing, but discretely from the command line. They were provided as part of the source package from which this package was derived.
+
+
+Requirements
+------------
+
+The REST API was written using web.py module, which is officially only compatible with Python 2.7. Therefore, the docker image was derived from a python:2.7.15 source.

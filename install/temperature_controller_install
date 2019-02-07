@@ -1,6 +1,11 @@
 #!/bin/sh
 
-cp 99-input.rules /etc/udev/rules.d
-cp temperature_controller_init /usr/bin/
+mkdir /usr/local/greenroom
+chmod 755 /usr/local/greenroom
 
-chmod 755  /usr/bin/temperature_controller_init
+cp 99-input.rules /etc/udev/rules.d
+cp temperature_controller_init /usr/local/bin/
+cp ../server/grcntrlrd.py /usr/local/greenroom
+cp ../server/config.json /usr/local/greenroom
+
+chmod 755  /usr/local/bin/temperature_controller_init

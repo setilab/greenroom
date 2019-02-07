@@ -5,7 +5,7 @@
                 {
                     "my_tcp_host": "192.168.3.204", 
                     "my_tcp_port": "12000", 
-                    "api_url": "http://localhost:8080/controllers/register", 
+                    "api_url": "http://eris.milkyway.net:31118/controllers/register", 
                     "my_reg_name": "rpi-cntrl"
                 }
             ]

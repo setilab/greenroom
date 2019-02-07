@@ -1,4 +1,5 @@
-FROM python:2.7.15-jessie
+FROM arm32v7/python:2.7.15
+ENV PATH=/usr/local/bin:/bin:/usr/bin:/sbin:/usr/sbin
 RUN easy_install web.py
 RUN useradd -ms /bin/bash api
 USER api

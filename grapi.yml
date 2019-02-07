@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: grapi
+  labels:
+    app: grapi.py
+spec:
+  type: NodePort
+  ports:
+    - port: 8080
+      protocol: TCP
+      targetPort: 8080
+      nodePort: 31118
+  selector:
+    app: grapi.py
+---
+apiVersion: apps/v1beta1 # for versions before 1.6.0 use extensions/v1beta1
+kind: Deployment
+metadata:
+  name: grapi
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: grapi.py
+    spec:
+      containers:
+      - name: grapi
+        image: cragginstylie/greenroom:v1.4-arm
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+

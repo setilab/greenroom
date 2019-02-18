@@ -56,8 +56,9 @@ def client(data, host, port):
 class MyVersion():
     def GET(self):
 
-        result = {'version': _VERSION_}
-        return "{}\n".format(result)
+        result = dict(version=_VERSION_)
+        #return "{}\n".format(result)
+        return json.dumps(result, indent=4) + "\n"
 
 
 class ControllerIDs():
@@ -72,7 +73,7 @@ class ControllerIDs():
             ids.append(id)
 
         result = {'controllers': ids}
-        return "{}\n".format(result)
+        return json.dumps(result, indent=4) + "\n"
 
 
 class Controllers():
@@ -140,6 +141,7 @@ class Register():
             if not registry.exists("ididx"):
                 mapping = {inputs.name:'0'}
                 registry.zadd("ididx", mapping, nx=True, xx=False, ch=False, incr=False)
+                registry.persist("ididx")
             else:
                 name = registry.zrange("ididx", -1, -1)
                 lastIdx = int(registry.zscore("ididx", name[0]))
@@ -149,6 +151,7 @@ class Register():
 
             mapping = {'name':inputs.name, 'host':inputs.host, 'port':inputs.port}
             registry.hmset(inputs.name, mapping)
+            registry.persist(inputs.name)
 
             result = {'data': [dict(zip(tuple([string[0]]),[string[1]]))]}
             return json.dumps(result, indent=4) + "\n"

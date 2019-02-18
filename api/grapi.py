@@ -6,6 +6,8 @@ import web
 import json
 import redis
 
+_VERSION_ = "1.5"
+
 registry = redis.StrictRedis(host='10.1.1.2', port=31119, db=0)
 
 urls = ('/controllers','Controllers',
@@ -18,7 +20,8 @@ urls = ('/controllers','Controllers',
         '/controllers/([0-9]{1,3})/shutdown','Shutdown',
         '/controllers/([0-9]{1,3})/status','Status',
         '/controllers/([0-9]{1,3})/temp','Temp',
-        '/controllers/([0-9]{1,3})/unregister','Unregister'
+        '/controllers/([0-9]{1,3})/unregister','Unregister',
+        '/version','Version'
 )
 
 app = web.application(urls, globals())
@@ -47,23 +50,25 @@ def client(data, host, port):
         return payload
 
 
+class Version():
+    def GET(self):
+
+        result = {'version': _VERSION_}
+        return "{}\n".format(result)
+
+
 class ControllerIDs():
     def GET(self):
-        string = ""
-        i = 0
+        ids = []
         global registry
         registry = redis.StrictRedis(host='10.1.1.2', port=31119, db=0)
 
 	ididx = registry.zrange("ididx", 0, -1)
         for name in ididx:
             id = int(registry.zscore("ididx", name))
-            if i < 1:
-                string += "{}".format(id)
-            else:
-                string += ", {}".format(id)
-            i += 1
+            ids.append(id)
 
-        result = {'controllers': [string]}
+        result = {'controllers': ids}
         return "{}\n".format(result)
 
 

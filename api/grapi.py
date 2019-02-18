@@ -2,8 +2,11 @@
 
 import socket
 import sys
-import web.py
+import web
 import json
+import redis
+
+registry = redis.StrictRedis(host='10.1.1.2', port=31119, db=0)
 
 urls = ('/controllers','Controllers',
         '/controllers/ids','ControllerIDs',
@@ -17,9 +20,6 @@ urls = ('/controllers','Controllers',
         '/controllers/([0-9]{1,3})/temp','Temp',
         '/controllers/([0-9]{1,3})/unregister','Unregister'
 )
-
-# Format example { "name":"controller1", "host":"localhost", "port":"12000" },
-controllers = []
 
 app = web.application(urls, globals())
 
@@ -51,38 +51,61 @@ class ControllerIDs():
     def GET(self):
         string = ""
         i = 0
-        for cntrlr in controllers:
+        global registry
+        registry = redis.StrictRedis(host='10.1.1.2', port=31119, db=0)
+
+	ididx = registry.zrange("ididx", 0, -1)
+        for name in ididx:
+            id = int(registry.zscore("ididx", name))
             if i < 1:
-                string += "{}".format(i)
+                string += "{}".format(id)
             else:
-                string += ", {}".format(i)
+                string += ", {}".format(id)
             i += 1
 
         result = {'controllers': [string]}
-        return result + "\n"
+        return "{}\n".format(result)
 
 
 class Controllers():
     def GET(self):
+        controllers = []
+
+        global registry
+        registry = redis.StrictRedis(host='10.1.1.2', port=31119, db=0)
+
+	ididx = registry.zrange("ididx", 0, -1)
+
+        for name in ididx:
+            controller = registry.hgetall(name)
+            controllers.append(controller)
+
         result = {'data': [controllers]}
         return json.dumps(result, indent=4) + "\n"
 
 
 class Controller():
-    def GET(self, cntrlr):
-        i = int(cntrlr)
-        if (i + 1) > len(controllers):
+    def GET(self, id):
+        i = int(id)
+
+        global registry
+        registry = redis.StrictRedis(host='10.1.1.2', port=31119, db=0)
+
+        name = registry.zrangebyscore("ididx", i, i)
+        if len(name) == 0:
             web.notfound()
             return
 
-        result = {'data': [controllers[i]]}
+        controller = registry.hgetall(name[0])
+
+        result = {'data': [controller]}
         return json.dumps(result, indent=4) + "\n"
 
 
 class Register():
     def POST(self):
-        global controllers
         inputs = web.input()
+
         if not "name" in inputs:
             web.webapi.badrequest(message="Must supply name parameter.")
             return
@@ -93,8 +116,12 @@ class Register():
             web.webapi.badrequest(message="Must supply port parameter.")
             return
 
-        for cntrlr in controllers:
-            if inputs.name in cntrlr.values():
+        global registry
+        registry = redis.StrictRedis(host='10.1.1.2', port=31119, db=0)
+
+	ididx = registry.zrange("ididx", 0, -1)
+        if ididx:
+            if len(ididx) >= 1 and inputs.name in ididx:
                 web.webapi.badrequest(message="name already exists.")
                 return
 
@@ -102,9 +129,18 @@ class Register():
         string = result.split("\n")
 
         if string[0] == "version" and len(string[1]) > 0:
-            controllers.append(dict(name="{}".format(inputs.name),
-                                    host="{}".format(inputs.host),
-                                    port="{}".format(inputs.port)))
+            if not registry.exists("ididx"):
+                mapping = {inputs.name:'0'}
+                registry.zadd("ididx", mapping, nx=True, xx=False, ch=False, incr=False)
+            else:
+                name = registry.zrange("ididx", -1, -1)
+                lastIdx = int(registry.zscore("ididx", name[0]))
+                nextIdx = lastIdx + 1
+                mapping = {inputs.name:nextIdx}
+                registry.zadd("ididx", mapping, nx=True, xx=False, ch=False, incr=False)
+
+            mapping = {'name':inputs.name, 'host':inputs.host, 'port':inputs.port}
+            registry.hmset(inputs.name, mapping)
 
             result = {'data': [dict(zip(tuple([string[0]]),[string[1]]))]}
             return json.dumps(result, indent=4) + "\n"
@@ -113,32 +149,56 @@ class Register():
 
 
 class Unregister():
-    def POST(self, cntrlr):
-        i = int(cntrlr)
-        controllers.pop(i)
+    def POST(self, id):
+        i = int(id)
 
+        global registry
+        registry = redis.StrictRedis(host='10.1.1.2', port=31119, db=0)
 
-class Settings():
-    def GET(self, cntrlr):
-        i = int(cntrlr)
-        if (i + 1) > len(controllers):
+        name = registry.zrangebyscore("ididx", i, i)
+        if len(name) == 0:
             web.notfound()
             return
 
-        result = client("GET SETTINGS", controllers[i]['host'], controllers[i]['port'])
+        result = registry.zremrangebyscore("ididx", i, i)
+        result = registry.delete(name[0])
+
+
+class Settings():
+    def GET(self, id):
+        i = int(id)
+
+        global registry
+        registry = redis.StrictRedis(host='10.1.1.2', port=31119, db=0)
+
+        name = registry.zrangebyscore("ididx", i, i)
+        if len(name) == 0:
+            web.notfound()
+            return
+
+        controller = registry.hgetall(name[0])
+
+        result = client("GET SETTINGS", controller['host'], controller['port'])
         string = result.split("\n")
         result = {'data': [dict(zip(tuple(string[0].split(",")),string[1].split(",")))]}
         return json.dumps(result, indent=4) + "\n"
 
 
 class SettingName():
-    def GET(self, cntrlr, setting):
-        i = int(cntrlr)
-        if (i + 1) > len(controllers):
+    def GET(self, id, setting):
+        i = int(id)
+
+        global registry
+        registry = redis.StrictRedis(host='10.1.1.2', port=31119, db=0)
+
+        name = registry.zrangebyscore("ididx", i, i)
+        if len(name) == 0:
             web.notfound()
             return
 
-        result = client("GET SETTINGS", controllers[i]['host'], controllers[i]['port'])
+        controller = registry.hgetall(name[0])
+
+        result = client("GET SETTINGS", controller['host'], controller['port'])
         string = result.split("\n")
         settings = string[0].split(",")
         values = string[1].split(",")
@@ -156,11 +216,18 @@ class SettingName():
             result = {'data': [dict(zip(tuple([setting]),[value]))]}
             return json.dumps(result, indent=4) + "\n"
 
-    def POST(self, cntrlr, setting):
-        i = int(cntrlr)
-        if (i + 1) > len(controllers):
+    def POST(self, id, setting):
+        i = int(id)
+
+        global registry
+        registry = redis.StrictRedis(host='10.1.1.2', port=31119, db=0)
+
+        name = registry.zrangebyscore("ididx", i, i)
+        if len(name) == 0:
             web.notfound()
             return
+
+        controller = registry.hgetall(name[0])
 
         inputs = web.input()
         if not "setTo" in inputs:
@@ -185,52 +252,81 @@ class SettingName():
             elif setting == "temp_scale":
                 cmd = "SET TEMP SCALE {}".format(inputs.setTo)
 
-        result = client(cmd, controllers[i]['host'], controllers[i]['port'])
-        result = client("APPLY", controllers[i]['host'], controllers[i]['port'])
+        result = client(cmd, controller['host'], controller['port'])
+        result = client("APPLY", controller['host'], controller['port'])
 
 
 class Save():
-    def POST(self, cntrlr):
-        i = int(cntrlr)
-        if (i + 1) > len(controllers):
+    def POST(self, id):
+        i = int(id)
+
+        global registry
+        registry = redis.StrictRedis(host='10.1.1.2', port=31119, db=0)
+
+        name = registry.zrangebyscore("ididx", i, i)
+        if len(name) == 0:
             web.notfound()
             return
 
-        result = client("SAVE", controllers[i]['host'], controllers[i]['port'])
+        controller = registry.hgetall(name[0])
+
+        result = client("SAVE", controller['host'], controller['port'])
 
 
 class Shutdown():
-    def POST(self, cntrlr):
-        i = int(cntrlr)
-        if (i + 1) > len(controllers):
+    def POST(self, id):
+        i = int(id)
+
+        global registry
+        registry = redis.StrictRedis(host='10.1.1.2', port=31119, db=0)
+
+        name = registry.zrangebyscore("ididx", i, i)
+        if len(name) == 0:
             web.notfound()
             return
 
-        result = client("SHUTDOWN", controllers[i]['host'], controllers[i]['port'])
-        controllers.pop(i)
+        controller = registry.hgetall(name[0])
+
+        result = client("SHUTDOWN", controller['host'], controller['port'])
+        result = registry.zremrangebyscore("ididx", i, i)
+        result = registry.delete(name[0])
 
 
 class Status():
-    def GET(self, cntrlr):
-        i = int(cntrlr)
-        if (i + 1) > len(controllers):
+    def GET(self, id):
+        i = int(id)
+
+        global registry
+        registry = redis.StrictRedis(host='10.1.1.2', port=31119, db=0)
+
+        name = registry.zrangebyscore("ididx", i, i)
+        if len(name) == 0:
             web.notfound()
             return
 
-        result = client("GET STATUS", controllers[i]['host'], controllers[i]['port'])
+        controller = registry.hgetall(name[0])
+
+        result = client("GET STATUS", controller['host'], controller['port'])
         string = result.split("\n")
         result = {'data': [dict(zip(tuple(string[0].split(",")),string[1].split(",")))]}
         return json.dumps(result, indent=4) + "\n"
 
 
 class Temp():
-    def GET(self, cntrlr):
-        i = int(cntrlr)
-        if (i + 1) > len(controllers):
+    def GET(self, id):
+        i = int(id)
+
+        global registry
+        registry = redis.StrictRedis(host='10.1.1.2', port=31119, db=0)
+
+        name = registry.zrangebyscore("ididx", i, i)
+        if len(name) == 0:
             web.notfound()
             return
 
-        result = client("\n", controllers[i]['host'], controllers[i]['port'])
+        controller = registry.hgetall(name[0])
+
+        result = client("\n", controller['host'], controller['port'])
         string = result.split("\n")
         result = {'data': [dict(zip(tuple(string[0].split(",")),string[1].split(",")))]}
         return json.dumps(result, indent=4) + "\n"

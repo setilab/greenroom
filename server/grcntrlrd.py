@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import argparse
 import socket
 import threading
 import SocketServer
@@ -29,7 +30,7 @@ my_tcp_port = 12000
 
 # Log/Config files
 my_config_file = "config.json"
-my_log_file = "/var/log/greenroom/gr-server.log"
+my_log_file = "grcntrlrd.log"
 gpio22_file = "/sys/class/gpio/gpio22/value"
 gpio27_file = "/sys/class/gpio/gpio27/value"
 
@@ -436,6 +437,13 @@ def init_config():
 
 
 if __name__ == "__main__":
+	parser = argparse.ArgumentParser()
+        parser.add_argument('-c', '--config-file', nargs='?',
+                            help="Path to a JSON formatted config file.")
+        args = parser.parse_args()
+	if args.config_file:
+		my_config_file=args.config_file
+
 	init_config()
 	init_logging()
 	init_phat()

@@ -7,9 +7,10 @@ import json
 import redis
 
 _VERSION_ = "1.5"
+_RHOST_ = 'grredis.default.svc.cluster.local'
+_RPORT_ = 6379
 
-#registry = redis.StrictRedis(host='10.1.1.2', port=31119, db=0)
-registry = redis.StrictRedis(host='grredis.default.svc.cluster.local', port=6379, db=0)
+registry = redis.StrictRedis(host=_RHOST_, port=_RPORT_, db=0)
 
 urls = ('/controllers','Controllers',
         '/controllers/ids','ControllerIDs',
@@ -22,7 +23,8 @@ urls = ('/controllers','Controllers',
         '/controllers/([0-9]{1,3})/status','Status',
         '/controllers/([0-9]{1,3})/temp','Temp',
         '/controllers/([0-9]{1,3})/unregister','Unregister',
-        '/version','Version'
+        '/controllers/([0-9]{1,3})/version','Version',
+        '/version','MyVersion'
 )
 
 app = web.application(urls, globals())
@@ -51,7 +53,7 @@ def client(data, host, port):
         return payload
 
 
-class Version():
+class MyVersion():
     def GET(self):
 
         result = {'version': _VERSION_}
@@ -62,7 +64,7 @@ class ControllerIDs():
     def GET(self):
         ids = []
         global registry
-        registry = redis.StrictRedis(host='10.1.1.2', port=31119, db=0)
+        registry = redis.StrictRedis(host=_RHOST_, port=_RPORT_, db=0)
 
 	ididx = registry.zrange("ididx", 0, -1)
         for name in ididx:
@@ -78,7 +80,7 @@ class Controllers():
         controllers = []
 
         global registry
-        registry = redis.StrictRedis(host='10.1.1.2', port=31119, db=0)
+        registry = redis.StrictRedis(host=_RHOST_, port=_RPORT_, db=0)
 
 	ididx = registry.zrange("ididx", 0, -1)
 
@@ -95,7 +97,7 @@ class Controller():
         i = int(id)
 
         global registry
-        registry = redis.StrictRedis(host='10.1.1.2', port=31119, db=0)
+        registry = redis.StrictRedis(host=_RHOST_, port=_RPORT_, db=0)
 
         name = registry.zrangebyscore("ididx", i, i)
         if len(name) == 0:
@@ -123,7 +125,7 @@ class Register():
             return
 
         global registry
-        registry = redis.StrictRedis(host='10.1.1.2', port=31119, db=0)
+        registry = redis.StrictRedis(host=_RHOST_, port=_RPORT_, db=0)
 
 	ididx = registry.zrange("ididx", 0, -1)
         if ididx:
@@ -159,7 +161,7 @@ class Unregister():
         i = int(id)
 
         global registry
-        registry = redis.StrictRedis(host='10.1.1.2', port=31119, db=0)
+        registry = redis.StrictRedis(host=_RHOST_, port=_RPORT_, db=0)
 
         name = registry.zrangebyscore("ididx", i, i)
         if len(name) == 0:
@@ -175,7 +177,7 @@ class Settings():
         i = int(id)
 
         global registry
-        registry = redis.StrictRedis(host='10.1.1.2', port=31119, db=0)
+        registry = redis.StrictRedis(host=_RHOST_, port=_RPORT_, db=0)
 
         name = registry.zrangebyscore("ididx", i, i)
         if len(name) == 0:
@@ -195,7 +197,7 @@ class SettingName():
         i = int(id)
 
         global registry
-        registry = redis.StrictRedis(host='10.1.1.2', port=31119, db=0)
+        registry = redis.StrictRedis(host=_RHOST_, port=_RPORT_, db=0)
 
         name = registry.zrangebyscore("ididx", i, i)
         if len(name) == 0:
@@ -226,7 +228,7 @@ class SettingName():
         i = int(id)
 
         global registry
-        registry = redis.StrictRedis(host='10.1.1.2', port=31119, db=0)
+        registry = redis.StrictRedis(host=_RHOST_, port=_RPORT_, db=0)
 
         name = registry.zrangebyscore("ididx", i, i)
         if len(name) == 0:
@@ -267,7 +269,7 @@ class Save():
         i = int(id)
 
         global registry
-        registry = redis.StrictRedis(host='10.1.1.2', port=31119, db=0)
+        registry = redis.StrictRedis(host=_RHOST_, port=_RPORT_, db=0)
 
         name = registry.zrangebyscore("ididx", i, i)
         if len(name) == 0:
@@ -284,7 +286,7 @@ class Shutdown():
         i = int(id)
 
         global registry
-        registry = redis.StrictRedis(host='10.1.1.2', port=31119, db=0)
+        registry = redis.StrictRedis(host=_RHOST_, port=_RPORT_, db=0)
 
         name = registry.zrangebyscore("ididx", i, i)
         if len(name) == 0:
@@ -303,7 +305,7 @@ class Status():
         i = int(id)
 
         global registry
-        registry = redis.StrictRedis(host='10.1.1.2', port=31119, db=0)
+        registry = redis.StrictRedis(host=_RHOST_, port=_RPORT_, db=0)
 
         name = registry.zrangebyscore("ididx", i, i)
         if len(name) == 0:
@@ -323,7 +325,7 @@ class Temp():
         i = int(id)
 
         global registry
-        registry = redis.StrictRedis(host='10.1.1.2', port=31119, db=0)
+        registry = redis.StrictRedis(host=_RHOST_, port=_RPORT_, db=0)
 
         name = registry.zrangebyscore("ididx", i, i)
         if len(name) == 0:
@@ -333,6 +335,26 @@ class Temp():
         controller = registry.hgetall(name[0])
 
         result = client("\n", controller['host'], controller['port'])
+        string = result.split("\n")
+        result = {'data': [dict(zip(tuple(string[0].split(",")),string[1].split(",")))]}
+        return json.dumps(result, indent=4) + "\n"
+
+
+class Version():
+    def GET(self, id):
+        i = int(id)
+
+        global registry
+        registry = redis.StrictRedis(host=_RHOST_, port=_RPORT_, db=0)
+
+        name = registry.zrangebyscore("ididx", i, i)
+        if len(name) == 0:
+            web.notfound()
+            return
+
+        controller = registry.hgetall(name[0])
+
+        result = client("GET VERSION\n", controller['host'], controller['port'])
         string = result.split("\n")
         result = {'data': [dict(zip(tuple(string[0].split(",")),string[1].split(",")))]}
         return json.dumps(result, indent=4) + "\n"

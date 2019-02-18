@@ -8,7 +8,8 @@ import redis
 
 _VERSION_ = "1.5"
 
-registry = redis.StrictRedis(host='10.1.1.2', port=31119, db=0)
+#registry = redis.StrictRedis(host='10.1.1.2', port=31119, db=0)
+registry = redis.StrictRedis(host='grredis.default.svc.cluster.local', port=6379, db=0)
 
 urls = ('/controllers','Controllers',
         '/controllers/ids','ControllerIDs',

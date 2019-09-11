@@ -27,7 +27,7 @@ spec:
     spec:
       containers:
       - name: grapi
-        image: cragginstylie/grapi:v1.5-arm
+        image: setilab/grapi:v1.5
         imagePullPolicy: Always
         ports:
         - containerPort: 8080

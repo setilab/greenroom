@@ -15,7 +15,7 @@ spec:
           claimName: nfs
       containers:
       - name: grredis
-        image: cragginstylie/grredis:v1.0
+        image: setilab/grredis:v1.0
         imagePullPolicy: Always
         securityContext:
           runAsUser: 0

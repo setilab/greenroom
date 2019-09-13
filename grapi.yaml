@@ -14,7 +14,7 @@ spec:
   selector:
     app: grapi.py
 ---
-apiVersion: apps/v1beta1 # for versions before 1.6.0 use extensions/v1beta1
+apiVersion: apps/v1beta1 # for versions before 1.6.0 use extensions/v1beta1 xxx
 kind: Deployment
 metadata:
   name: grapi

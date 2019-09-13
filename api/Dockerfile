@@ -5,4 +5,4 @@ RUN adduser -D -s /bin/sh api
 USER api
 WORKDIR /api
 COPY grapi.py /api
-CMD ["python", "grapi.py"]
+CMD ["python", "grapi.py", "_RHOST_PORT_"]

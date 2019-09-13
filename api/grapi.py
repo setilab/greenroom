@@ -83,7 +83,7 @@ class Controllers():
         global registry
         registry = redis.StrictRedis(host=_RHOST_, port=_RPORT_, db=0)
 
-	ididx = registry.zrange("ididx", 0, -1)
+        ididx = registry.zrange("ididx", 0, -1)
 
         for name in ididx:
             controller = registry.hgetall(name)
@@ -128,7 +128,7 @@ class Register():
         global registry
         registry = redis.StrictRedis(host=_RHOST_, port=_RPORT_, db=0)
 
-	ididx = registry.zrange("ididx", 0, -1)
+        ididx = registry.zrange("ididx", 0, -1)
         if ididx:
             if len(ididx) >= 1 and inputs.name in ididx:
                 web.webapi.badrequest(message="name already exists.")

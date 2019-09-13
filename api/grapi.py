@@ -7,8 +7,10 @@ import json
 import redis
 
 _VERSION_ = "1.5.1"
-_RHOST_ = 'grredis.default.svc.cluster.local'
-_RPORT_ = 6379
+
+args = sys.argv[1].split(":")
+_RHOST_ = args[0]
+_RPORT_ = args[1]
 
 registry = redis.StrictRedis(host=_RHOST_, port=_RPORT_, db=0)
 

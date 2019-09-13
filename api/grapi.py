@@ -12,6 +12,8 @@ args = sys.argv[1].split(":")
 _RHOST_ = args[0]
 _RPORT_ = args[1]
 
+sys.argv[1] = ""
+
 registry = redis.StrictRedis(host=_RHOST_, port=_RPORT_, db=0)
 
 urls = ('/controllers','Controllers',

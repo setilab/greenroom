@@ -6,7 +6,7 @@ import web
 import json
 import redis
 
-_VERSION_ = "1.5.1"
+_VERSION_ = "1.5"
 
 args = sys.argv[1].split(":")
 _RHOST_ = args[0]

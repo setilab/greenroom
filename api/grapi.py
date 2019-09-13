@@ -67,7 +67,7 @@ class ControllerIDs():
         global registry
         registry = redis.StrictRedis(host=_RHOST_, port=_RPORT_, db=0)
 
-	ididx = registry.zrange("ididx", 0, -1)
+        ididx = registry.zrange("ididx", 0, -1)
         for name in ididx:
             id = int(registry.zscore("ididx", name))
             ids.append(id)

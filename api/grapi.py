@@ -8,9 +8,13 @@ import redis
 
 _VERSION_ = "1.5.1"
 
+print(sys.argv)
 args = sys.argv[1].split(":")
+print(args)
 _RHOST_ = args[0]
+print(_RHOST_)
 _RPORT_ = args[1]
+print(_RPORT_)
 
 sys.argv[1] = ""
 

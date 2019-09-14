@@ -8,12 +8,13 @@ import redis
 
 _VERSION_ = "1.5.1"
 
-print(sys.argv)
-args = sys.argv[2].split(":")
+args = sys.argv[1].split(":")
 _RHOST_ = args[0]
 _RPORT_ = args[1]
+print(_RHOST_)
+print(_RPORT_)
 
-sys.argv[2] = ""
+sys.argv[1] = ""
 
 registry = redis.StrictRedis(host=_RHOST_, port=_RPORT_, db=0)
 

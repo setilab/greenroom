@@ -5,4 +5,4 @@ RUN useradd -ms /bin/bash api
 USER api
 WORKDIR /api
 COPY grapi.py /api
-CMD ["python", "grapi.py", "_RHOST_PORT_"]
+CMD ["python", "grapi.py"]

@@ -4,7 +4,7 @@ import argparse
 import socket
 import threading
 import SocketServer
-import smbus
+#import smbus
 import time
 import datetime
 import os

@@ -5,7 +5,7 @@
                 {
                     "my_tcp_host": "0.0.0.0", 
                     "my_tcp_port": "12000", 
-                    "api_url": "http://grapi.greenroom.svc.cluster.local/controllers/register", 
+                    "api_url": "http://grapi.greenroom.svc.cluster.local:8080/controllers/register", 
                     "my_reg_name": "cntrlr-01"
                 }
             ]

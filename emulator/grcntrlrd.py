@@ -18,7 +18,7 @@ import json
 #bus = smbus.SMBus(1)
 
 # App version
-_VERSION_ = "1.0"
+_VERSION_ = "1.1"
 
 # API to register with
 api_url = "http://localhost:8080/controllers/register"

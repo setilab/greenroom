@@ -420,8 +420,8 @@ def init_config():
 		settings = config[2]["settings"]
 
 		api_url = tcp_api[0]["api_url"]
-		my_reg_name = tcp_api[0]["my_reg_name"]
-		my_tcp_host = tcp_api[0]["my_tcp_host"]
+		#my_reg_name = tcp_api[0]["my_reg_name"]
+		#my_tcp_host = tcp_api[0]["my_tcp_host"]
 		my_tcp_port = int(tcp_api[0]["my_tcp_port"])
 
 		my_log_file = files[0]["my_log_file"]

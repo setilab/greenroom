@@ -14,27 +14,27 @@ while true ; do
     heatto = `echo $settings | cut -d',' -f1`
     coolto = `echo $settings | cut -d',' -f2`
 
-    if [ cold_relay == "off" && hot_relay == "off" ]; then
-        if [ season == "summer" ]; then
+    if [ $cold_relay == "off" && $hot_relay == "off" ]; then
+        if [ $season == "summer" ]; then
             curr_temp++
-            echo curr_temp > bus.pseudo
+            echo $curr_temp > bus.pseudo
         else
             curr_temp--
-            echo curr_temp > bus.pseudo
+            echo $curr_temp > bus.pseudo
         fi
 
-    elif [ cold_relay == "on" ]; then
+    elif [ $cold_relay == "on" ]; then
 
-        if [ cool_setto < curr_temp ]; then
-            curr_temp--
-            echo curr_temp > bus.pseudo
+        if [ $cool_setto < $curr_temp ]; then
+            $curr_temp--
+            echo $curr_temp > bus.pseudo
         fi
 
-    elif [ hot_relay == "on" ]; then
+    elif [ $hot_relay == "on" ]; then
 
-        if [ heat_setto > curr_temp ]; then
-            curr_temp++
-            echo curr_temp > bus.pseudo
+        if [ $heat_setto > $curr_temp ]; then
+            $curr_temp++
+            echo $curr_temp > bus.pseudo
         fi
 
     fi

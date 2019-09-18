@@ -19,18 +19,21 @@ while true ; do
         else
             curr_temp--
             echo curr_temp > bus.pseudo
+        fi
 
     elif [ cold_relay == "on" ]; then
 
         if [ cool_setto < curr_temp ]; then
             curr_temp--
             echo curr_temp > bus.pseudo
+        fi
 
     elif [ hot_relay == "on" ]; then
 
         if [ heat_setto > curr_temp ]; then
             curr_temp++
             echo curr_temp > bus.pseudo
+        fi
 
     fi
 

@@ -4,7 +4,7 @@ season=$1
 
 while true ; do
 
-    curr_temp=`cat bus.pseudo`
+    curr_temp=`cat mnt/bus.pseudo`
 
     relays=`./grclient.py get status | tail -1`
     cold_relay=`echo $relays | cut -d',' -f1`

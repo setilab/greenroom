@@ -2,4 +2,4 @@
 
 ./simulator &
 
-./grcntrolrd.py -c config.json
+./grcntrlrd.py -c config.json

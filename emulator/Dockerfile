@@ -6,5 +6,5 @@ ADD mnt /gr
 COPY grcntrlrd.py /gr
 COPY grclient.py /gr
 COPY config.json /gr
-COPY bus.pseudo /gr
+COPY mnt/bus.pseudo /gr/mnt
 CMD ["python", "grcntrlrd.py", "-c", "config.json"]

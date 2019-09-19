@@ -382,6 +382,7 @@ def register_api():
 			logging.info("Successfully registered to API service.")
 		else:
     			logging.warn("API registration failed with HTTP Error {}".format(response.status_code))
+    			logging.debug("name={},host={},port={}".format(my_reg_name,my_tcp_host,my_tcp_port))
 	except:
 		logging.warn("API registration failed with an unspecified HTTP Error.")
 

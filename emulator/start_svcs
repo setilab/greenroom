@@ -1,0 +1,5 @@
+#!/bin/bash
+
+./simulator &
+
+./grcntrolrd.py -c config.json

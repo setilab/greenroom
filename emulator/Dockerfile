@@ -7,4 +7,4 @@ COPY grclient.py /gr
 COPY config.json /gr
 COPY bus.pseudo /gr
 COPY simulator /gr
-CMD ["python", "grcntrlrd.py", "-c", "config.json"]
+CMD ["bash", "start_svcs"]

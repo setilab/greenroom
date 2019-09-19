@@ -225,7 +225,7 @@ def filter(input_value):
 def get_fahrenheit_val(): 
 	#data = bus.read_i2c_block_data(address, 1,2)
 	#val = (data[0] << 8) + data[1]
-        with open("bus.pseudo",'r') as f:
+        with open("mnt/bus.pseudo",'r') as f:
                 val = int(f.read())
 	return val/5.00*9.00/5.00+32.00
 
@@ -233,7 +233,7 @@ def get_fahrenheit_val():
 def get_celsius_val(): 
 	#data = bus.read_i2c_block_data(address, 1,2)
 	#val = (data[0] << 8) + data[1]
-        with open("bus.pseudo",'r') as f:
+        with open("mnt/bus.pseudo",'r') as f:
                 val = int(f.read())
 	return val/5.00
 

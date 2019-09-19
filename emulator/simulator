@@ -1,25 +1,25 @@
 #!/bin/bash
 
-season = $1
+season=$1
 
 while true ; do
 
-    curr_temp = `cat bus.pseudo`
+    curr_temp=`cat bus.pseudo`
 
-    relays = `./grclient.py get status | tail -1`
-    cold_relay = `echo $relays | cut -d',' -f1`
-    hot_relay = `echo $relays | cut -d',' -f2`
+    relays=`./grclient.py get status | tail -1`
+    cold_relay=`echo $relays | cut -d',' -f1`
+    hot_relay=`echo $relays | cut -d',' -f2`
 
-    settings = `./grclient.py get settings | tail -1`
-    heatto = `echo $settings | cut -d',' -f1`
-    coolto = `echo $settings | cut -d',' -f2`
+    settings=`./grclient.py get settings | tail -1`
+    heatto=`echo $settings | cut -d',' -f1`
+    coolto=`echo $settings | cut -d',' -f2`
 
     if [ $cold_relay == "off" && $hot_relay == "off" ]; then
         if [ $season == "summer" ]; then
-            curr_temp++
+            $curr_temp++
             echo $curr_temp > bus.pseudo
         else
-            curr_temp--
+            $curr_temp--
             echo $curr_temp > bus.pseudo
         fi
 

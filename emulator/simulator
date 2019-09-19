@@ -14,7 +14,7 @@ while true ; do
     heatto=`echo $settings | cut -d',' -f1`
     coolto=`echo $settings | cut -d',' -f2`
 
-    if [ $cold_relay == "off" && $hot_relay == "off" ]; then
+    if [ $cold_relay == "off" ] && [ $hot_relay == "off" ]; then
         if [ $season == "summer" ]; then
             $curr_temp++
             echo $curr_temp > bus.pseudo

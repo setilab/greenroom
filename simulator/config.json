@@ -1,0 +1,37 @@
+{
+    "config": [
+        {
+            "tcp/api": [
+                {
+                    "my_tcp_host": "0.0.0.0", 
+                    "my_tcp_port": "12000", 
+                    "api_url": "http://grapi.greenroom.svc.cluster.local:8080/controllers/register", 
+                    "my_reg_name": "cntrlr-01"
+                }
+            ]
+        }, 
+        {
+            "files": [
+                {
+                    "my_log_file": "gr-server.log", 
+                    "gpio27_file": "/mnt/gpio27.pseudo", 
+                    "gpio22_file": "/mnt/gpio22.pseudo"
+                }
+            ]
+        }, 
+        {
+            "settings": [
+                {
+                    "tc_start_delay": "15", 
+                    "cool_start_delay": "30", 
+                    "temp_scale": "F", 
+                    "cool_offset": "5", 
+                    "coolto": "75", 
+                    "heatto": "72", 
+                    "state_change_delay": "120", 
+                    "heat_offset": "2"
+                }
+            ]
+        }
+    ]
+}

@@ -39,6 +39,6 @@ while true ; do
 
     fi
 
-    sleep 3
+    sleep 10
 
 done

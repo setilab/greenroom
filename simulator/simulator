@@ -1,11 +1,10 @@
 #!/bin/bash
 
-season=$1
-
 sleep 30
 
 while true ; do
 
+    season=`cat season`
     curr_temp=`cat /mnt/bus.pseudo`
 
     relays=`./grclient.py get status | tail -1`

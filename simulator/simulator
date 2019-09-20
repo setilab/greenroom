@@ -26,14 +26,14 @@ while true ; do
 
     elif [ $cold_relay == "on" ]; then
 
-        if [ $cool_setto < $curr_temp ]; then
+        if [ $coolto < $curr_temp ]; then
             ((curr_temp=curr_temp-1))
             echo $curr_temp > /mnt/bus.pseudo
         fi
 
     elif [ $hot_relay == "on" ]; then
 
-        if [ $heat_setto > $curr_temp ]; then
+        if [ $heatto > $curr_temp ]; then
             ((curr_temp=curr_temp+1))
             echo $curr_temp > /mnt/bus.pseudo
         fi

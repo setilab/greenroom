@@ -15,13 +15,21 @@ while true ; do
     heatto=`echo $settings | cut -d',' -f1`
     coolto=`echo $settings | cut -d',' -f2`
 
+    echo "current temp is $curr_temp"
+    echo "cold relay is $cold_relay"
+    echo "hot relay is $hot_relay"
+    echo "cold set to "$coldto"
+    echo "heat set to $heatto"
+
     if [ $cold_relay == "off" ] && [ $hot_relay == "off" ]; then
         if [ $season == "summer" ]; then
             ((curr_temp=curr_temp+1))
             echo $curr_temp > /mnt/bus.pseudo
+            echo "both relays are off, it's summertime, temp is increasing..."
         else
             ((curr_temp=curr_temp-1))
             echo $curr_temp > /mnt/bus.pseudo
+            echo "both relays are off, it's wintertime, temp is decreasing..."
         fi
 
     elif [ $cold_relay == "on" ]; then
@@ -29,6 +37,7 @@ while true ; do
         if [ $coolto < $curr_temp ]; then
             ((curr_temp=curr_temp-1))
             echo $curr_temp > /mnt/bus.pseudo
+            echo "cold relay is on, temp is decreasing..."
         fi
 
     elif [ $hot_relay == "on" ]; then
@@ -36,6 +45,7 @@ while true ; do
         if [ $heatto > $curr_temp ]; then
             ((curr_temp=curr_temp+1))
             echo $curr_temp > /mnt/bus.pseudo
+            echo "hot relay is on, temp is increasing..."
         fi
 
     fi

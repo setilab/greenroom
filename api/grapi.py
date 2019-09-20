@@ -132,7 +132,7 @@ class Register():
         ididx = registry.zrange("ididx", 0, -1)
         if ididx:
             if len(ididx) >= 1 and inputs.name in ididx:
-                web.webapi.badrequest(message="name already exists.")
+                web.webapi.conflict(message="Name already exists.")
                 return
 
         result = client("GET VERSION", inputs.host, inputs.port)
@@ -157,7 +157,7 @@ class Register():
             result = {'data': [dict(zip(tuple([string[0]]),[string[1]]))]}
             return json.dumps(result, indent=4) + "\n"
         else:
-            web.notfound()
+            web.api.internalerror(message="Invalid response from remote controller {}.".format(inputs.host))
 
 
 class Unregister():

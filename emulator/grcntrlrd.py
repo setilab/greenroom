@@ -119,24 +119,27 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
 
 		if cmd[4:12] == "SETTINGS" :
 			schema = "heatto,coolto,cool_offset,heat_offset,tc_start_delay,cool_start_delay,state_change_delay,temp_scale"
-       			self.request.sendall(schema)
+       			#self.request.sendall(schema)
 
 			values = "{},{},{},{},{},{},{},{}".format(heatTo,coolTo,cool_offset,heat_offset,tc_start_delay,cool_start_delay,state_change_delay,temp_scale)
-       			self.request.sendall(values)
+       			#self.request.sendall(values)
+       			self.request.sendall(schema + "\n" + values)
 
 		elif cmd[4:10] == "STATUS" :
 			cold = temp_relay_status("cold")
 			hot = temp_relay_status("hot")
 
 			schema = "fan,heater"
-       			self.request.sendall(schema)
+       			#self.request.sendall(schema)
 
 			values = "{},{}".format(cold, hot)
-       			self.request.sendall(values)
+       			#self.request.sendall(values)
+       			self.request.sendall(schema + "\n" + values)
 
 		elif cmd[4:11] == "VERSION" :
-                        self.request.sendall("version")
-                        self.request.sendall(_VERSION_)
+                        #self.request.sendall("version")
+                        #self.request.sendall(_VERSION_)
+                        self.request.sendall("version\n" + _VERSION_)
 
 		logging.debug("Replied to GET command from client.")
 		
@@ -201,10 +204,12 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
 		tempVal = str(get_temp())
 
 		schema = "value,scale"
-       		self.request.sendall(schema)
+       		#self.request.sendall(schema)
 
 		values = "{},{}".format(tempVal,temp_scale)
-       		self.request.sendall(values)
+       		#self.request.sendall(values)
+       		#self.request.sendall(schema)
+       		self.request.sendall(values + "\n" + schema)
 
 		logging.debug("Supplied current temp: {}".format(values))
 

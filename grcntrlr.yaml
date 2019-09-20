@@ -1,0 +1,33 @@
+apiVersion: apps/v1beta1 # for versions before 1.6.0 use extensions/v1beta1
+kind: Deployment
+metadata:
+  name: grcntrlr
+  namespace: greenroom
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: grcntrlrd.py
+    spec:
+      volumes:
+      - name: shared-data
+        emptyDir: {}
+      containers:
+      - name: grcntrlr
+        image: setilab/grcntrlr:${input.API_MAJOR_VERSION}.${executionIndex}
+        imagePullPolicy: Always
+        volumeMounts:
+        - name: shared-data
+          mountPath: /data
+        ports:
+        - containerPort: 12000
+          protocol: TCP
+        command: ["/bin/bash"]
+        args: ["-c", "echo 122 > /data/bus.pseudo"]
+      - name: grsidecar
+        image: setilab/grcntrlr-sidecar:${input.API_MAJOR_VERSION}.${executionIndex}
+        imagePullPolicy: Always
+        volumeMounts:
+        - name: shared-data
+          mountPath: /data

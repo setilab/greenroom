@@ -14,8 +14,8 @@
             "files": [
                 {
                     "my_log_file": "gr-server.log", 
-                    "gpio27_file": "mnt/gpio27.pseudo", 
-                    "gpio22_file": "mnt/gpio22.pseudo"
+                    "gpio27_file": "/data/gpio27.pseudo", 
+                    "gpio22_file": "/data/gpio22.pseudo"
                 }
             ]
         }, 

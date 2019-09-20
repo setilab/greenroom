@@ -18,7 +18,7 @@ while true ; do
     echo "current temp is $curr_temp"
     echo "cold relay is $cold_relay"
     echo "hot relay is $hot_relay"
-    echo "cold set to "$coldto"
+    echo "cold set to $coldto"
     echo "heat set to $heatto"
 
     if [ $cold_relay == "off" ] && [ $hot_relay == "off" ]; then

@@ -1,9 +1,7 @@
 FROM python:2.7.15
 ENV PATH=/usr/local/bin:/bin:/usr/bin:/sbin:/usr/sbin
 RUN easy_install requests
-COPY data /
 WORKDIR /gr
 COPY grcntrlrd.py /gr
 COPY config.json /gr
-COPY stub.py /gr
-CMD ["python", "stub.py"]
+CMD ["python", "grcntrlrd.py", "-c", "config.json"]

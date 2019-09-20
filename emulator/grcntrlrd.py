@@ -16,7 +16,7 @@ import requests
 import json
 
 #bus = smbus.SMBus(1)
-bus = "/data/bus.pseudo"
+bus = "/mnt/bus.pseudo"
 
 # App version
 _VERSION_ = "1.1"

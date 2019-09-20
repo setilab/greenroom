@@ -4,4 +4,5 @@ RUN easy_install requests
 WORKDIR /gr
 COPY grcntrlrd.py /gr
 COPY config.json /gr
-CMD ["python", "grcntrlrd.py", "-c", "config.json"]
+COPY startup /gr
+CMD ["bash", "startup"]

@@ -1,0 +1,5 @@
+#!/bin/bash
+
+echo "122" > /mnt/bus.pseudo
+
+python grcntrlrd.py -c config.json

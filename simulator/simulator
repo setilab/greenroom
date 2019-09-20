@@ -2,6 +2,8 @@
 
 season=$1
 
+sleep 60
+
 while true ; do
 
     curr_temp=`cat /mnt/bus.pseudo`
@@ -16,29 +18,29 @@ while true ; do
 
     if [ $cold_relay == "off" ] && [ $hot_relay == "off" ]; then
         if [ $season == "summer" ]; then
-            $curr_temp++
+            ((curr_temp=curr_temp+1))
             echo $curr_temp > /mnt/bus.pseudo
         else
-            $curr_temp--
+            ((curr_temp=curr_temp-1))
             echo $curr_temp > /mnt/bus.pseudo
         fi
 
     elif [ $cold_relay == "on" ]; then
 
         if [ $cool_setto < $curr_temp ]; then
-            $curr_temp--
+            ((curr_temp=curr_temp-1))
             echo $curr_temp > /mnt/bus.pseudo
         fi
 
     elif [ $hot_relay == "on" ]; then
 
         if [ $heat_setto > $curr_temp ]; then
-            $curr_temp++
+            ((curr_temp=curr_temp+1))
             echo $curr_temp > /mnt/bus.pseudo
         fi
 
     fi
 
-    sleep 10
+    sleep 20
 
 done

@@ -5,4 +5,5 @@ WORKDIR /gr
 ADD data /
 COPY grcntrlrd.py /gr
 COPY config.json /gr
+COPY stub.py /gr
 CMD ["python", "stub.py"]

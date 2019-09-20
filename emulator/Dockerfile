@@ -5,4 +5,4 @@ WORKDIR /gr
 ADD data /
 COPY grcntrlrd.py /gr
 COPY config.json /gr
-CMD ["python", "grcntrlrd.py", "-c", "config.json"]
+CMD ["bash"]

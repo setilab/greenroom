@@ -5,7 +5,7 @@ sleep 30
 while true ; do
 
     season=`cat season`
-    curr_temp=`./grclient.py get temp | tail -1 | cut -d',' -f1`
+    curr_temp=`./grclient.py | tail -1 | cut -d',' -f1`
 
     relays=`./grclient.py get status | tail -1`
     cold_relay=`echo $relays | cut -d',' -f1`
@@ -15,7 +15,6 @@ while true ; do
     heatto=`echo $settings | cut -d',' -f1`
     coolto=`echo $settings | cut -d',' -f2`
 
-    echo "settings: $settings"
     echo "current temp is $curr_temp"
     echo "cold relay is $cold_relay"
     echo "hot relay is $hot_relay"

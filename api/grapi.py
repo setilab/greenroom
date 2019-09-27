@@ -6,7 +6,7 @@ import web
 import json
 import redis
 
-_VERSION_ = "1.5.2"
+_VERSION_ = "1.5.3"
 
 _RHOST_ = 'grredis.greenroom.svc.cluster.local'
 _RPORT_ = 6379

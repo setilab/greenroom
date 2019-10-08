@@ -4,5 +4,4 @@ RUN easy_install requests
 WORKDIR /sim
 COPY simulator /sim
 COPY grclient.py /sim
-COPY season /sim
 CMD ["bash", "simulator"]

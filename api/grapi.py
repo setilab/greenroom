@@ -94,6 +94,7 @@ class ControllerIDs():
             ids.append(id)
 
         result = {'controllers': ids}
+        print(result)
         return json.dumps(result, indent=4) + "\n"
 
 
@@ -111,6 +112,7 @@ class Controllers():
             controllers.append(controller)
 
         result = {'data': [controllers]}
+        print(result)
         return json.dumps(result, indent=4) + "\n"
 
 
@@ -129,6 +131,7 @@ class Controller():
         controller = registry.hgetall(name[0])
 
         result = {'data': [controller]}
+        print(result)
         return json.dumps(result, indent=4) + "\n"
 
 

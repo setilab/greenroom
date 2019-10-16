@@ -1,4 +1,4 @@
-FROM python:latest
+FROM python:3.5
 ENV PATH=/usr/local/bin:/bin:/usr/bin:/sbin:/usr/sbin
 RUN pip3 install web.py==0.40 redis
 RUN useradd -ms /bin/bash api

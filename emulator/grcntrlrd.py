@@ -443,7 +443,7 @@ def init_config():
 		files = config[1]["files"]
 		settings = config[2]["settings"]
 
-		api_url = tcp_api[0]["api_url"]
+		#api_url = tcp_api[0]["api_url"]
 		if _EMULATOR_ == False:
 			my_reg_name = tcp_api[0]["my_reg_name"]
 			my_tcp_host = tcp_api[0]["my_tcp_host"]

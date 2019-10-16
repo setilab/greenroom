@@ -21,7 +21,11 @@ bus = smbus.SMBus(1)
 _VERSION_ = "1.4"
 
 # API to register with
-api_url = "http://localhost:8080/controllers/register"
+_API_ = os.getenv("GR_API_URL")
+if len(_API_) > 0:
+    api_url = _API_
+else:
+    api_url = "http://localhost:8080/controllers/register"
 
 # TCP server values
 my_reg_name = socket.gethostname()

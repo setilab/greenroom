@@ -23,10 +23,12 @@ while true ; do
 
     if [ $cold_relay == "off" ] && [ $hot_relay == "off" ]; then
         if [ $season == "summer" ]; then
+            ((curr_temp=curr_temp - 32 * 5 / 9 * 5))
             ((curr_temp=curr_temp+1))
             echo $curr_temp > /mnt/bus.pseudo
             echo "both relays are off, it's summertime, temp is increasing..."
         else
+            ((curr_temp=curr_temp - 32 * 5 / 9 * 5))
             ((curr_temp=curr_temp-1))
             echo $curr_temp > /mnt/bus.pseudo
             echo "both relays are off, it's wintertime, temp is decreasing..."
@@ -35,6 +37,7 @@ while true ; do
     elif [ $cold_relay == "on" ]; then
 
         if [ $coolto < $curr_temp ]; then
+            ((curr_temp=curr_temp - 32 * 5 / 9 * 5))
             ((curr_temp=curr_temp-1))
             echo $curr_temp > /mnt/bus.pseudo
             echo "cold relay is on, temp is decreasing..."
@@ -43,6 +46,7 @@ while true ; do
     elif [ $hot_relay == "on" ]; then
 
         if [ $heatto > $curr_temp ]; then
+            ((curr_temp=curr_temp - 32 * 5 / 9 * 5))
             ((curr_temp=curr_temp+1))
             echo $curr_temp > /mnt/bus.pseudo
             echo "hot relay is on, temp is increasing..."

@@ -2,8 +2,21 @@
 
 import socket
 import sys
+import os
 
-HOST, PORT = "localhost", 12000
+_HOST_ = os.getenv("GR_CNTRLR_HOST")
+_PORT_ = os.getenv("GR_CNTRLR_PORT")
+
+if len(_HOST_) > 0:
+    HOST = _HOST_
+else:
+    HOST = "localhost"
+
+if len(_PORT_) > 0:
+    PORT = _PORT_
+else:
+    PORT = 12000
+
 data = " ".join(sys.argv[1:])
 
 # Create a socket (SOCK_STREAM means a TCP socket)

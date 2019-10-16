@@ -56,7 +56,7 @@ def client(data, host, port):
 
     try:
         # Connect to server and send data
-	print("Connecting to {} on port {}".format(HOST, PORT))
+        print("Connecting to {} on port {}".format(HOST, PORT))
         sock.connect((HOST, PORT))
         print("Sending {}".format(data))
         sock.sendall(data)

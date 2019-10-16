@@ -24,9 +24,9 @@ else:
 # Redis Port
 redisPort = os.getenv("GR_REDIS_PORT")
 if len(redisPort) > 0:
-    _RPORT_ = int(redisPort)
+    _RPORT_ = redisPort
 else:
-    _RPORT_ = 6379
+    _RPORT_ = "6379"
 
 registry = redis.StrictRedis(host=_RHOST_, port=_RPORT_, db=0)
 

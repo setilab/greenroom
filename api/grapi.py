@@ -24,7 +24,7 @@ else:
 # Redis Port
 redisPort = os.getenv("GR_REDIS_PORT")
 if len(redisPort) > 0:
-    _RPORT_ = redisPort
+    _RPORT_ = int(redisPort)
 else:
     _RPORT_ = 6379
 

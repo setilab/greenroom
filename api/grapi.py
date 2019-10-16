@@ -59,14 +59,14 @@ def client(data, host, port):
         print("Connecting to {} on port {}".format(HOST, PORT))
         sock.connect((HOST, PORT))
         print("Sending {}".format(data))
-        sock.sendall(data)
+        sock.sendall(data.encode())
 
         # Receive data from the server and shut down
         while True:
             received = sock.recv(1024)
-            print("Received {}".format(received))
+            print("Received {}".format(received.decode()))
             if len(received) > 0:
-                payload += "{}\n".format(received)
+                payload += "{}\n".format(received.decode())
             else:
                 break
     finally:

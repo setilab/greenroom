@@ -1,15 +1,32 @@
 #!/usr/local/bin/python
 
+import os
 import socket
 import sys
 import web
 import json
 import redis
 
-_VERSION_ = "1.5.3"
+# Current version/build
+ver = os.getenv("GR_API_VER")
+if len(ver) > 0:
+    _VERSION_ = ver
+else:
+    _VERSION_ = "1.X.x"
 
-_RHOST_ = 'grredis.greenroom.svc.cluster.local'
-_RPORT_ = 6379
+# Redis Host
+redisHost = os.getenv("GR_REDIS_HOST")
+if len(redisHost) > 0:
+    _RHOST_ = redisHost
+else:
+    _RHOST_ = 'grredis.greenroom.svc.cluster.local'
+
+# Redis Port
+redisPort = os.getenv("GR_REDIS_PORT")
+if len(redisPort) > 0:
+    _RPORT_ = redisPort
+else:
+    _RPORT_ = 6379
 
 registry = redis.StrictRedis(host=_RHOST_, port=_RPORT_, db=0)
 

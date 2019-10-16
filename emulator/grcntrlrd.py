@@ -4,7 +4,6 @@ import argparse
 import socket
 import threading
 import SocketServer
-#import smbus
 import time
 import datetime
 import os
@@ -15,14 +14,31 @@ import logging.handlers
 import requests
 import json
 
-#bus = smbus.SMBus(1)
-bus = "/mnt/bus.pseudo"
+mode = os.getenv("GR_EMULATOR_MODE")
+if len(mode) > 0:
+	_EMULATOR_ = True
+else:
+	_EMULATOR_ = False
+
+if _EMULATOR_ == True:
+	bus = "/mnt/bus.pseudo"
+else:
+	import smbus
+	bus = smbus.SMBus(1)
 
 # App version
-_VERSION_ = "1.1"
+ver = os.getenv("GR_CNTRLR_VER")
+if len(ver) > 0:
+	_VERSION_ = ver
+else:
+	_VERSION_ = "1.x"
 
 # API to register with
-api_url = "http://localhost:8080/controllers/register"
+_API_ = os.getenv("GR_API_URL")
+if len(_API_) > 0:
+    api_url = _API_
+else:
+    api_url = "http://localhost:8080/controllers/register"
 
 # TCP server values
 my_reg_name = socket.gethostname()
@@ -32,11 +48,16 @@ my_tcp_port = 12000
 # Log/Config files
 my_config_file = "config.json"
 my_log_file = "grcntrlrd.log"
-gpio22_file = "gpio22.psuedo"
-gpio27_file = "gpio27.psuedo"
 
-#I2C addres
-#address = 0x4d
+if _EMULATOR_ == True:
+	gpio22_file = "gpio22.psuedo"
+	gpio27_file = "gpio27.psuedo"
+else:
+	gpio22_file = "/sys/class/gpio/gpio22/value"
+	gpio27_file = "/sys/class/gpio/gpio27/value"
+
+	#I2C addres
+	address = 0x4d
 
 # flow logic
 shutdown = 0
@@ -119,18 +140,17 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
 
 		if cmd[4:12] == "SETTINGS" :
 			schema = "heatto,coolto,cool_offset,heat_offset,tc_start_delay,cool_start_delay,state_change_delay,temp_scale"
-
 			values = "{},{},{},{},{},{},{},{}".format(heatTo,coolTo,cool_offset,heat_offset,tc_start_delay,cool_start_delay,state_change_delay,temp_scale)
-       			self.request.sendall(schema + "\n" + values)
+			self.request.sendall(schema + "\n" + values)
 
 		elif cmd[4:10] == "STATUS" :
 			cold = temp_relay_status("cold")
 			hot = temp_relay_status("hot")
 
 			schema = "fan,heater"
-
 			values = "{},{}".format(cold, hot)
-       			self.request.sendall(schema + "\n" + values)
+
+			self.request.sendall(schema + "\n" + values)
 
 		elif cmd[4:11] == "VERSION" :
                         self.request.sendall("version\n" + _VERSION_)
@@ -198,9 +218,9 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
 		tempVal = str(get_temp())
 
 		schema = "value,scale"
-
 		values = "{},{}".format(tempVal,temp_scale)
-       		self.request.sendall(schema + "\n" + values)
+
+		self.request.sendall(schema + "\n" + values)
 
 		logging.debug("Supplied current temp: {}".format(values))
 
@@ -220,18 +240,24 @@ def filter(input_value):
 
 
 def get_fahrenheit_val(): 
-	#data = bus.read_i2c_block_data(address, 1,2)
-	#val = (data[0] << 8) + data[1]
-        with open(bus,'r') as f:
-                val = int(f.read())
+	if _EMULATOR_ == True:
+		with open(bus,'r') as f:
+			val = int(f.read())
+	else:
+		data = bus.read_i2c_block_data(address, 1,2)
+		val = (data[0] << 8) + data[1]
+
 	return val/5.00*9.00/5.00+32.00
 
 
 def get_celsius_val(): 
-	#data = bus.read_i2c_block_data(address, 1,2)
-	#val = (data[0] << 8) + data[1]
-        with open(bus,'r') as f:
-                val = int(f.read())
+	if _EMULATOR_ == True:
+		with open(bus,'r') as f:
+			val = int(f.read())
+	else:
+		data = bus.read_i2c_block_data(address, 1,2)
+		val = (data[0] << 8) + data[1]
+
 	return val/5.00
 
 
@@ -343,17 +369,18 @@ def convert_c(c):
 
 def init_phat():
 	f1 = f2 = 0
-	#gpio22 = os.path.exists(gpio22_file)
-	#if gpio22:
-	#	f1 = 1
-	#gpio27 = os.path.exists(gpio27_file)
-	#if gpio27:
-	#	f2 = 1
+	gpio22 = os.path.exists(gpio22_file)
+	if gpio22:
+		f1 = 1
+	gpio27 = os.path.exists(gpio27_file)
+	if gpio27:
+		f2 = 1
 
 	if f1 == 1 and f2 == 1 :
 		return
 	else:
-		#call(["sudo", "temperature_controller_init"])	
+		if _EMULATOR_ == False:
+			call(["sudo", "temperature_controller_init"])	
 		lmsg = "Initializing hardware..."
 		logging.info(lmsg)
 
@@ -379,7 +406,6 @@ def register_api():
 			logging.info("Successfully registered to API service.")
 		else:
     			logging.warn("API registration failed with HTTP Error {}".format(response.status_code))
-    			logging.debug("name={},host={},port={}".format(my_reg_name,my_tcp_host,my_tcp_port))
 	except:
 		logging.warn("API registration failed with an unspecified HTTP Error.")
 
@@ -418,8 +444,9 @@ def init_config():
 		settings = config[2]["settings"]
 
 		api_url = tcp_api[0]["api_url"]
-		#my_reg_name = tcp_api[0]["my_reg_name"]
-		#my_tcp_host = tcp_api[0]["my_tcp_host"]
+		if _EMULATOR_ == False:
+			my_reg_name = tcp_api[0]["my_reg_name"]
+			my_tcp_host = tcp_api[0]["my_tcp_host"]
 		my_tcp_port = int(tcp_api[0]["my_tcp_port"])
 
 		my_log_file = files[0]["my_log_file"]
@@ -450,6 +477,10 @@ if __name__ == "__main__":
 	init_logging()
 	init_phat()
         set_close()
+
+	if _EMULATOR_ == True:
+		lmsg = "Emulator mode enabled."
+		logging.info(lmsg)
 
 	HOST, PORT = "0.0.0.0", my_tcp_port
 

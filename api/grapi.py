@@ -153,7 +153,7 @@ class Register():
                 return
 
         result = client("GET VERSION", inputs.host, inputs.port)
-	print("Client got from server: {}".format(result))
+        print("Client got from server: {}".format(result))
         string = result.split("\n")
 
         if string[0] == "version" and len(string[1]) > 0:

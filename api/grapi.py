@@ -171,6 +171,9 @@ class Register():
                 mapping = {inputs.name:nextIdx}
                 registry.zadd("ididx", mapping, nx=True, xx=False, ch=False, incr=False)
 
+            print("Name var type is {}".format(type(inputs.name)))
+            print("Host var type is {}".format(type(inputs.host)))
+            print("Port var type is {}".format(type(inputs.port)))
             mapping = {'name':inputs.name, 'host':inputs.host, 'port':inputs.port}
             registry.hmset(inputs.name, mapping)
             registry.persist(inputs.name)

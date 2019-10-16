@@ -174,7 +174,7 @@ class Register():
             result = {'data': [dict(zip(tuple([string[0]]),[string[1]]))]}
             return json.dumps(result, indent=4) + "\n"
         else:
-            web.api.internalerror(message="Invalid response from remote controller {}.".format(inputs.host))
+            web.webapi.internalerror(message="Invalid response from remote controller {}.".format(inputs.host))
 
 
 class Unregister():

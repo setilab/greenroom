@@ -1,6 +1,6 @@
-FROM python:2.7.15
+FROM python:latest
 ENV PATH=/usr/local/bin:/bin:/usr/bin:/sbin:/usr/sbin
-RUN pip install web.py==0.40 redis
+RUN pip install web.py redis
 RUN useradd -ms /bin/bash api
 USER api
 WORKDIR /api

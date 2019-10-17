@@ -90,7 +90,6 @@ class ControllerIDs():
             ids.append(id)
 
         result = {'controllers': ids}
-        print(result)
         return json.dumps(result, indent=4) + "\n"
 
 
@@ -119,7 +118,6 @@ class Controller():
         registry = redis.Redis(host=_RHOST_, port=_RPORT_, db=0, decode_responses=True)
 
         name = registry.zrangebyscore("ididx", i, i)
-        print(name)
         if len(name) == 0:
             web.notfound()
             return
@@ -209,6 +207,7 @@ class Settings():
         controller = registry.hgetall(name[0])
 
         result = client("GET SETTINGS", controller['host'], controller['port'])
+        print(result)
         string = result.split("\n")
         result = {'data': [dict(zip(tuple(string[0].split(",")),string[1].split(",")))]}
         return json.dumps(result, indent=4) + "\n"

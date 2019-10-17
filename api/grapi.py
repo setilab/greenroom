@@ -112,8 +112,8 @@ class Controllers():
             controllers.append(controller)
 
         result = {'data': [controllers]}
-        print(result)
-        return json.dumps(result, indent=4) + "\n"
+        #return json.dumps(result, indent=4) + "\n"
+        return result
 
 
 class Controller():
@@ -132,7 +132,8 @@ class Controller():
 
         result = {'data': [controller]}
         print(result)
-        return json.dumps(result, indent=4) + "\n"
+        #return json.dumps(result, indent=4) + "\n"
+        return result
 
 
 class Register():

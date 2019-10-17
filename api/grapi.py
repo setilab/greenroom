@@ -100,7 +100,7 @@ class Controllers():
         controllers = []
 
         global registry
-        registry = redis.StrictRedis(host=_RHOST_, port=_RPORT_, db=0, decode_responses=True)
+        registry = redis.Redis(host=_RHOST_, port=_RPORT_, db=0, decode_responses=True)
 
         ididx = registry.zrange("ididx", 0, -1)
 

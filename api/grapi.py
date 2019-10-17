@@ -119,6 +119,7 @@ class Controller():
         registry = redis.Redis(host=_RHOST_, port=_RPORT_, db=0, decode_responses=True)
 
         name = registry.zrangebyscore("ididx", i, i)
+        print(name)
         if len(name) == 0:
             web.notfound()
             return

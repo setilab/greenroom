@@ -56,15 +56,12 @@ def client(data, host, port):
 
     try:
         # Connect to server and send data
-        print("Connecting to {} on port {}".format(HOST, PORT))
         sock.connect((HOST, PORT))
-        print("Sending {}".format(data))
         sock.sendall(data.encode())
 
         # Receive data from the server and shut down
         while True:
             received = sock.recv(1024)
-            print("Received {}".format(received.decode()))
             if len(received) > 0:
                 payload += "{}\n".format(received.decode())
             else:
@@ -103,7 +100,7 @@ class Controllers():
         controllers = []
 
         global registry
-        registry = redis.StrictRedis(host=_RHOST_, port=_RPORT_, db=0)
+        registry = redis.StrictRedis(host=_RHOST_, port=_RPORT_, db=0, decode_responses=True)
 
         ididx = registry.zrange("ididx", 0, -1)
 

@@ -1,8 +1,7 @@
-FROM python:2.7.15
+FROM python:3.5
 ENV PATH=/usr/local/bin:/bin:/usr/bin:/sbin:/usr/sbin
-RUN easy_install requests
+RUN pip3 requests
 WORKDIR /gr
 COPY grcntrlrd.py /gr
 COPY config.json /gr
-COPY startup /gr
-CMD ["bash", "startup"]
+CMD ["python", "grcntrlrd.py"]

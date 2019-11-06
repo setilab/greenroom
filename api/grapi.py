@@ -136,6 +136,18 @@ class Register():
         if not "port" in inputs:
             web.webapi.badrequest(message="Must supply port parameter.")
             return
+        if not "type" in inputs:
+            web.webapi.badrequest(message="Must supply port parameter.")
+            return
+        if not "capability" in inputs:
+            web.webapi.badrequest(message="Must supply port parameter.")
+            return
+        if not "vendor" in inputs:
+            web.webapi.badrequest(message="Must supply port parameter.")
+            return
+        if not "model" in inputs:
+            web.webapi.badrequest(message="Must supply port parameter.")
+            return
 
         global registry
         registry = redis.Redis(host=_RHOST_, port=_RPORT_, db=0, decode_responses=True)
@@ -161,7 +173,7 @@ class Register():
                 mapping = {inputs.name:nextIdx}
                 registry.zadd("ididx", mapping, nx=True, xx=False, ch=False, incr=False)
 
-            mapping = {'name':inputs.name, 'host':inputs.host, 'port':inputs.port}
+            mapping = {'name':inputs.name, 'host':inputs.host, 'port':inputs.port, 'type':inputs.type, 'capability':inputs.capability, 'vendor':inputs.vendor, 'model':inputs.model}
             registry.hmset(inputs.name, mapping)
             registry.persist(inputs.name)
 

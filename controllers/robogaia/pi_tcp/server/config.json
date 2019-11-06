@@ -13,7 +13,7 @@
         {
             "files": [
                 {
-                    "my_log_file": "gr-server.log", 
+                    "my_log_file": "grcntrlrd.log", 
                     "gpio27_file": "/mnt/gpio27.pseudo", 
                     "gpio22_file": "/mnt/gpio22.pseudo"
                 }

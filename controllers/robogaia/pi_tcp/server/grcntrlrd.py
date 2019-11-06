@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/local/bin/python
 
 import argparse
 import socket
@@ -14,25 +14,29 @@ import logging.handlers
 import requests
 import json
 
-if _EMULATOR_ == True:
+# App version
+_VERSION_ = "1.4.1"
+
+# HW Info
+_TYPE_ = "controller"
+_CAP_ = "temperature"
+_VENDOR_ = "Robogaia"
+_MODEL_ = "pi_tcp"
+
+# Build num
+_BUILD_ = os.getenv("GR_CNTRLR_BUILD", "X.xxx")
+
+# API to register with
+_API_ = os.getenv("GR_API_URL", "http://localhost:8080/controllers/register")
+
+# Run as emulator or not
+_EMULATOR_ = os.getenv("GR_EMULATOR_MODE", "False")
+
+if _EMULATOR_ == "True":
 	bus = "/mnt/bus.pseudo"
 else:
 	import smbus
 	bus = smbus.SMBus(1)
-
-# App version
-ver = os.getenv("GR_CNTRLR_VER")
-if len(ver) > 0:
-	_VERSION_ = ver
-else:
-	_VERSION_ = "1.x"
-
-# API to register with
-_API_ = os.getenv("GR_API_URL")
-if len(_API_) > 0:
-    api_url = _API_
-else:
-    api_url = "http://localhost:8080/controllers/register"
 
 # TCP server values
 my_reg_name = socket.gethostname()
@@ -43,7 +47,7 @@ my_tcp_port = 12000
 my_config_file = "config.json"
 my_log_file = "grcntrlrd.log"
 
-if _EMULATOR_ == True:
+if _EMULATOR_ == "True":
 	gpio22_file = "gpio22.psuedo"
 	gpio27_file = "gpio27.psuedo"
 else:
@@ -234,7 +238,7 @@ def filter(input_value):
 
 
 def get_fahrenheit_val(): 
-	if _EMULATOR_ == True:
+	if _EMULATOR_ == "True":
 		with open(bus,'r') as f:
 			val = int(f.read())
 	else:
@@ -245,7 +249,7 @@ def get_fahrenheit_val():
 
 
 def get_celsius_val(): 
-	if _EMULATOR_ == True:
+	if _EMULATOR_ == "True":
 		with open(bus,'r') as f:
 			val = int(f.read())
 	else:
@@ -392,7 +396,7 @@ def init_logging():
 def register_api():
 	logging.info("Registering to API service...")
 
-	data = "name={}&host={}&port={}".format(my_reg_name, my_tcp_host, my_tcp_port)
+	data = "name={}&host={}&port={}&type={}&capability={}&vendor={}&model={}".format(my_reg_name,my_tcp_host,my_tcp_port,_TYPE_,_CAP_,_VENDOR_,_MODEL_)
 
 	try:
 		response = requests.post(api_url, data=data)
@@ -437,7 +441,7 @@ def init_config():
 		files = config[1]["files"]
 		settings = config[2]["settings"]
 
-		api_url = tcp_api[0]["api_url"]
+		#api_url = tcp_api[0]["api_url"]
 		if _EMULATOR_ == False:
 			my_reg_name = tcp_api[0]["my_reg_name"]
 			my_tcp_host = tcp_api[0]["my_tcp_host"]
@@ -463,21 +467,18 @@ if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
         parser.add_argument('-c', '--config-file', nargs='?',
                             help="Path to a JSON formatted config file.")
-        parser.add_argument('-e', '--emulator-mode',
-                            help="Run in emulator mode for testing.")
         args = parser.parse_args()
 	if args.config_file:
 		my_config_file=args.config_file
-
-	if args.emulator_mode:
-		_EMULATOR_ = True
-        else:
-		_EMULATOR_ = False
 
 	init_config()
 	init_logging()
 	init_phat()
         set_close()
+
+	if _EMULATOR_ == "True":
+		lmsg = "Emulator mode enabled."
+		logging.info(lmsg)
 
 	HOST, PORT = "0.0.0.0", my_tcp_port
 

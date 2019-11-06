@@ -2,6 +2,4 @@
 
 echo "122" > /mnt/bus.pseudo
 
-export GR_EMULATOR_MODE=true
-
 python grcntrlrd.py

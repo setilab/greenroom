@@ -65,6 +65,7 @@ def client(data, host, port):
 class MyVersion():
     def GET(self):
 
+        web.header('Content-Type', 'application/json')
         result = dict(version=_VERSION_,build=_BUILD_)
         return json.dumps(result, indent=4) + "\n"
 

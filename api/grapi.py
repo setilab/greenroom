@@ -7,26 +7,17 @@ import web
 import json
 import redis
 
-# Current version/build
-ver = os.getenv("GR_API_VER")
-if len(ver) > 0:
-    _VERSION_ = ver
-else:
-    _VERSION_ = "1.X.x"
+# Current self
+_VERSION_ = "1.4.12"
+
+# Build num
+_BUILD_ = os.getenv("GR_API_BUILD", "X.xxx")
 
 # Redis Host
-redisHost = os.getenv("GR_REDIS_HOST")
-if len(redisHost) > 0:
-    _RHOST_ = redisHost
-else:
-    _RHOST_ = 'grredis.greenroom.svc.cluster.local'
+redisHost = os.getenv("GR_REDIS_HOST", "grredis.greenroom.svc.cluster.local")
 
 # Redis Port
-redisPort = os.getenv("GR_REDIS_PORT")
-if len(redisPort) > 0:
-    _RPORT_ = redisPort
-else:
-    _RPORT_ = "6379"
+redisPort = os.getenv("GR_REDIS_PORT", "6379")
 
 registry = redis.Redis(host=_RHOST_, port=_RPORT_, db=0, decode_responses=True)
 
@@ -74,7 +65,7 @@ def client(data, host, port):
 class MyVersion():
     def GET(self):
 
-        result = dict(version=_VERSION_)
+        result = dict(version=_VERSION_,build=_BUILD_)
         return json.dumps(result, indent=4) + "\n"
 
 

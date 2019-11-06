@@ -14,10 +14,10 @@ _VERSION_ = "1.4.12"
 _BUILD_ = os.getenv("GR_API_BUILD", "X.xxx")
 
 # Redis Host
-redisHost = os.getenv("GR_REDIS_HOST", "grredis.greenroom.svc.cluster.local")
+_RHOST_ = os.getenv("GR_REDIS_HOST", "grredis.greenroom.svc.cluster.local")
 
 # Redis Port
-redisPort = os.getenv("GR_REDIS_PORT", "6379")
+_RPORT_ = os.getenv("GR_REDIS_PORT", "6379")
 
 registry = redis.Redis(host=_RHOST_, port=_RPORT_, db=0, decode_responses=True)
 

@@ -1,0 +1,24 @@
+#!/bin/sh
+
+#port 22 is the hot relay
+#port 27 is the cold relay 
+arg="$1"
+
+if [ "$arg" = "cold" ] ; then
+    status=`cat /sys/class/gpio/gpio27/value`
+    if [ "$status" = "1" ] ; then
+        echo "Fan: On" 
+    else
+        echo "Fan: Off" 
+    fi
+elif [ "$arg" = "hot" ] ; then
+    status=`cat /sys/class/gpio/gpio22/value`
+    if [ "$status" = "1" ] ; then
+        echo "Heater: On" 
+    else
+        echo "Heater: Off" 
+    fi
+else
+    echo “Wrong argument value. Use values hot or cold.”
+    echo $arg
+fi

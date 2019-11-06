@@ -18,11 +18,11 @@ try:
 
     # Receive data from the server and shut down
     while True:
-	received = sock.recv(1024)
-	if len(received) > 0:
-        	print("{}".format(received.decode()))
-	else:
-		break
+        received = sock.recv(1024)
+        if len(received) > 0:
+            print("{}".format(received.decode()))
+        else:
+            break
 
 finally:
     sock.close()

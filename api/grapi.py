@@ -81,6 +81,7 @@ class ControllerIDs():
             id = int(registry.zscore("ididx", name))
             ids.append(id)
 
+        web.header('Content-Type', 'application/json')
         result = {'controllers': ids}
         return json.dumps(result, indent=4) + "\n"
 
@@ -98,6 +99,7 @@ class Controllers():
             controller = registry.hgetall(name)
             controllers.append(controller)
 
+        web.header('Content-Type', 'application/json')
         result = {'data': [controllers]}
         return json.dumps(result, indent=4) + "\n"
 
@@ -116,6 +118,7 @@ class Controller():
 
         controller = registry.hgetall(name[0])
 
+        web.header('Content-Type', 'application/json')
         result = {'data': [controller]}
         return json.dumps(result, indent=4) + "\n"
 
@@ -162,6 +165,7 @@ class Register():
             registry.hmset(inputs.name, mapping)
             registry.persist(inputs.name)
 
+            web.header('Content-Type', 'application/json')
             result = {'data': [dict(zip(tuple([string[0]]),[string[1]]))]}
             return json.dumps(result, indent=4) + "\n"
         else:
@@ -183,6 +187,8 @@ class Unregister():
         result = registry.zremrangebyscore("ididx", i, i)
         result = registry.delete(name[0])
 
+        web.webapi.ok()
+
 
 class Settings():
     def GET(self, id):
@@ -200,6 +206,8 @@ class Settings():
 
         result = client("GET SETTINGS", controller['host'], controller['port'])
         string = result.split("\n")
+
+        web.header('Content-Type', 'application/json')
         result = {'data': [dict(zip(tuple(string[0].split(",")),string[1].split(",")))]}
         return json.dumps(result, indent=4) + "\n"
 
@@ -233,6 +241,7 @@ class SettingName():
         if not len(value) > 0:
             web.notfound()
         else:
+            web.header('Content-Type', 'application/json')
             result = {'data': [dict(zip(tuple([setting]),[value]))]}
             return json.dumps(result, indent=4) + "\n"
 
@@ -275,6 +284,8 @@ class SettingName():
         result = client(cmd, controller['host'], controller['port'])
         result = client("APPLY", controller['host'], controller['port'])
 
+        web.webapi.ok()
+
 
 class Save():
     def POST(self, id):
@@ -291,6 +302,8 @@ class Save():
         controller = registry.hgetall(name[0])
 
         result = client("SAVE", controller['host'], controller['port'])
+
+        web.webapi.ok()
 
 
 class Shutdown():
@@ -311,6 +324,7 @@ class Shutdown():
         result = registry.zremrangebyscore("ididx", i, i)
         result = registry.delete(name[0])
 
+        web.webapi.ok()
 
 class Status():
     def GET(self, id):
@@ -328,6 +342,8 @@ class Status():
 
         result = client("GET STATUS", controller['host'], controller['port'])
         string = result.split("\n")
+
+        web.header('Content-Type', 'application/json')
         result = {'data': [dict(zip(tuple(string[0].split(",")),string[1].split(",")))]}
         return json.dumps(result, indent=4) + "\n"
 
@@ -348,6 +364,8 @@ class Temp():
 
         result = client("\n", controller['host'], controller['port'])
         string = result.split("\n")
+
+        web.header('Content-Type', 'application/json')
         result = {'data': [dict(zip(tuple(string[0].split(",")),string[1].split(",")))]}
         return json.dumps(result, indent=4) + "\n"
 
@@ -368,6 +386,8 @@ class Version():
 
         result = client("GET VERSION\n", controller['host'], controller['port'])
         string = result.split("\n")
+
+        web.header('Content-Type', 'application/json')
         result = {'data': [dict(zip(tuple(string[0].split(",")),string[1].split(",")))]}
         return json.dumps(result, indent=4) + "\n"
 

@@ -403,7 +403,7 @@ def init_logging():
 
 
 def register_api():
-    logging.info("Registering to API service...")
+    logging.info("Registering to API service at {}...".format(api_url))
 
     data = "name={}&host={}&port={}&type={}&capability={}&vendor={}&model={}".format(my_reg_name,my_tcp_host,my_tcp_port,_TYPE_,_CAP_,_VENDOR_,_MODEL_)
     logging.debug(data)

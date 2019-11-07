@@ -94,8 +94,9 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
         global temp_scale, t_temp_scale
         global shutdown
 
-        data = self.request.recv(1024).strip()
-        cmd = data.upper()
+        data = self.request.recv(1024).decode()
+        txt = data.strip()
+        cmd = txt.upper()
 
         lmsg = "Got TCP connection from {}".format(self.client_address[0])
         logging.info(lmsg)

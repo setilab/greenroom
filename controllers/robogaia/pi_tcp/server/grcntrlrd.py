@@ -81,7 +81,7 @@ _SAVE_ = 4
 # misc
 temp_scale = t_temp_scale = "F"
 
-class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
+class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
 
     def handle(self):
         global coolTo, t_coolTo
@@ -223,7 +223,7 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
             logging.debug("Supplied current temp: {}".format(values))
 
 
-class ThreadedTCPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
+class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     pass
 
 

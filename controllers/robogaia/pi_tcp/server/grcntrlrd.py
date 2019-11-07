@@ -406,6 +406,7 @@ def register_api():
     logging.info("Registering to API service...")
 
     data = "name={}&host={}&port={}&type={}&capability={}&vendor={}&model={}".format(my_reg_name,my_tcp_host,my_tcp_port,_TYPE_,_CAP_,_VENDOR_,_MODEL_)
+    logging.debug(data)
 
     try:
         response = requests.post(api_url, data=data)

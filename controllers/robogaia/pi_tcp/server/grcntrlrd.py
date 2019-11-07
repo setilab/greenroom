@@ -28,6 +28,7 @@ _BUILD_ = os.getenv("GR_CNTRLR_BUILD", "X.xxx")
 
 # API to register with
 _API_ = os.getenv("GR_API_URL", "http://localhost:8080/controllers/register")
+api_url = _API_
 
 # Run as emulator or not
 _EMULATOR_ = os.getenv("GR_EMULATOR_MODE", "False")
@@ -452,6 +453,7 @@ def init_config():
         settings = config[2]["settings"]
 
         #api_url = tcp_api[0]["api_url"]
+        api_url = _API_
         if _EMULATOR_ == "False":
             my_reg_name = tcp_api[0]["my_reg_name"]
             my_tcp_host = tcp_api[0]["my_tcp_host"]

@@ -2,4 +2,4 @@
 
 echo "122" > /mnt/bus.pseudo
 
-python grcntrlrd.py
+python grcntrlrd.py -c config.json

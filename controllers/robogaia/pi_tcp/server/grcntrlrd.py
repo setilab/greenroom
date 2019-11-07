@@ -76,6 +76,7 @@ _GET_ = 3
 _SET_ = 3
 _APPLY_ = 5
 _SHUTDOWN_ = 8
+_REGISTER_ = 8
 _SAVE_ = 4
 
 # misc
@@ -212,7 +213,12 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
             shutdown = 1
             response = "Shutting down server..."
             self.request.sendall(bytes(response, 'utf-8'))
+            logging.info(response)
 
+        elif cmd[:_REGISTER_] == "REGISTER":
+            response = "Registering to API service..."
+            self.request.sendall(bytes(response, 'utf-8'))
+            register_api()
             logging.info(response)
         else:
             tempVal = str(get_temp())

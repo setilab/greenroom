@@ -15,7 +15,7 @@ import requests
 import json
 
 # App version
-_VERSION_ = "1.5.2"
+_VERSION_ = "1.5.3"
 
 # HW Info
 _TYPE_ = "controller"

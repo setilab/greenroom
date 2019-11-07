@@ -131,7 +131,7 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
             else:
                 response = "Unknown command."
 
-                self.request.sendall(response)
+                self.request.sendall(bytes(response, 'utf-8'))
                 logging.info(response)
 
         elif cmd[:_GET_] == "GET":
@@ -139,7 +139,8 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
             if cmd[4:12] == "SETTINGS" :
                 schema = "heatto,coolto,cool_offset,heat_offset,tc_start_delay,cool_start_delay,state_change_delay,temp_scale"
                 values = "{},{},{},{},{},{},{},{}".format(heatTo,coolTo,cool_offset,heat_offset,tc_start_delay,cool_start_delay,state_change_delay,temp_scale)
-                self.request.sendall(schema + "\n" + values)
+
+                self.request.sendall(bytes(schema + "\n" + values, 'utf-8'))
 
             elif cmd[4:10] == "STATUS" :
                 cold = temp_relay_status("cold")
@@ -148,10 +149,10 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
                 schema = "fan,heater"
                 values = "{},{}".format(cold, hot)
 
-                self.request.sendall(schema + "\n" + values)
+                self.request.sendall(bytes(schema + "\n" + values, 'utf-8'))
 
             elif cmd[4:11] == "VERSION" :
-                        self.request.sendall("version\n" + _VERSION_)
+                self.request.sendall(bytes("version\n" + _VERSION_, 'utf-8'))
 
             logging.debug("Replied to GET command from client.")
 
@@ -174,11 +175,11 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
             if not temp_scale == t_temp_scale:
                 set_scale(t_temp_scale)
 
-            self.request.sendall(response)
+            self.request.sendall(bytes(response, 'utf-8'))
 
         elif cmd[:_SAVE_] == "SAVE":
             response = "Saving configuration to file..."
-            self.request.sendall(response)
+            self.request.sendall(bytes(response, 'utf-8'))
             logging.info(response)
 
             rawdata1 = "heatto,coolto,cool_offset,heat_offset,tc_start_delay,cool_start_delay,state_change_delay,temp_scale"
@@ -209,7 +210,7 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
         elif cmd[:_SHUTDOWN_] == "SHUTDOWN":
             shutdown = 1
             response = "Shutting down server..."
-            self.request.sendall(response)
+            self.request.sendall(bytes(response, 'utf-8'))
 
             logging.info(response)
         else:
@@ -218,7 +219,7 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
             schema = "value,scale"
             values = "{},{}".format(tempVal,temp_scale)
 
-            self.request.sendall(schema + "\n" + values)
+            self.request.sendall(bytes(schema + "\n" + values, 'utf-8'))
 
             logging.debug("Supplied current temp: {}".format(values))
 

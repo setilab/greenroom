@@ -550,8 +550,8 @@ if __name__ == "__main__":
             lmsg = "Heating to {}{} in {}s".format(heatTo - heat_offset, temp_scale, state_change_delay)
             logging.info(lmsg)
             while delay < state_change_delay:
-            if shutdown == 1:
-                break
+                if shutdown == 1:
+                    break
             delay += 1
             t = get_temp()
             time.sleep(1.0)
@@ -576,8 +576,8 @@ if __name__ == "__main__":
             isCooling = False
             isHeating = False
             while delay < state_change_delay:
-            if shutdown == 1:
-                break
+                if shutdown == 1:
+                    break
             delay += 1
             t = get_temp()
             time.sleep(1.0)

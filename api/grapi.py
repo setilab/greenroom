@@ -8,7 +8,7 @@ import json
 import redis
 
 # Current self
-_VERSION_ = "1.5.3"
+_VERSION_ = "1.5.4"
 
 # Build num
 _BUILD_ = os.getenv("GR_API_BUILD", "X.xxx")
@@ -57,6 +57,8 @@ def client(data, host, port):
                 payload += "{}\n".format(received.decode())
             else:
                 break
+    except:
+        payload = "device" + "\n" + "offline"
     finally:
         sock.close()
         return payload

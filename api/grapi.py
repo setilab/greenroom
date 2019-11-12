@@ -8,7 +8,7 @@ import json
 import redis
 
 # Current self
-_VERSION_ = "1.5.4"
+_VERSION_ = "1.5.5"
 
 # Build num
 _BUILD_ = os.getenv("GR_API_BUILD", "X.xxx")

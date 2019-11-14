@@ -1,14 +1,16 @@
 #!/usr/local/bin/python
 
+import time
 import os
 import socket
 import sys
 import web
 import json
 import redis
+import wavefront_api_client as wf_api
 
 # Current self
-_VERSION_ = "1.5.5"
+_VERSION_ = "1.6.0"
 
 # Build num
 _BUILD_ = os.getenv("GR_API_BUILD", "X.xxx")
@@ -18,6 +20,9 @@ _RHOST_ = os.getenv("GR_REDIS_HOST", "grredis.greenroom.svc.cluster.local")
 
 # Redis Port
 _RPORT_ = os.getenv("GR_REDIS_PORT", "6379")
+
+# WAVEFRONT TOKEN
+_WFTOKEN_ = os.getenv("GR_WAVEFRONT_TOKEN", "Disabled")
 
 registry = redis.Redis(host=_RHOST_, port=_RPORT_, db=0, decode_responses=True)
 
@@ -38,12 +43,36 @@ urls = ('/controllers','Controllers',
 
 app = web.application(urls, globals())
 
+# ------ WAVEFRONT INTEGRATION -------
+
+if _WFTOKEN_ != "Disabled":
+    # Configure API key authorization: api_key
+    wfConfig = wf_api.Configuration()
+    wfConfig.host = 'https://vmware.wavefront.com'
+    wfConfig.api_key['X-AUTH-TOKEN'] = _WFTOKEN_
+
+    wfApiInstance = wf_api.DirectIngestionApi(wf_api.ApiClient(wfConfig))
+    wfDataFormat = 'wavefront'
+    wfMetricSourceName_GrApiResponse = 'gr.api.response'
+
+    wfMetricName_GrCntrlr = 'gr.api.cntrlr'
+    wfMetricName_GrRedis = 'gr.api.redis'
+
+    def wfDirectSenderSingleMetric(wfMetricName, wfMetricSourceName, metricValue):
+        body = wfMetricName + ' ' + str(metricValue) + ' source=' + wfMetricSourceName
+        wfApiInstance.report(f=wfDataFormat, body=body)
+        return body
+
+# ------------------------------------
+
 def client(data, host, port):
     payload = ""
     HOST, PORT = host, int(port)
 
     # Create a socket (SOCK_STREAM means a TCP socket)
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+    start_time = time.time()
 
     try:
         # Connect to server and send data
@@ -59,10 +88,14 @@ def client(data, host, port):
                 break
     except:
         payload = "device" + "\n" + "offline"
+
     finally:
         sock.close()
-        return payload
 
+    # ------- WAVEFRONT ACTION => Inject Data ---------
+    wfDirectSenderSingleMetric(wfMetricName_GrCntrlr, wfMetricSourceName_GrApiResponse, time.time() - start_time)
+
+    return payload
 
 class MyVersion():
     def GET(self):

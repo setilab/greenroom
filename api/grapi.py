@@ -53,10 +53,10 @@ if _WFTOKEN_ != "Disabled":
 
     wfApiInstance = wf_api.DirectIngestionApi(wf_api.ApiClient(wfConfig))
     wfDataFormat = 'wavefront'
-    wfMetricSourceName_GrApiResponse = 'gr.api.response'
+    wfMetricSourceName_GrApi = 'gr.api.test'
 
-    wfMetricName_GrCntrlr = 'gr.api.cntrlr'
-    wfMetricName_GrRedis = 'gr.api.redis'
+    wfMetricName_GrCntrlrResponse = 'gr.api.cntrlr.response.time'
+    wfMetricName_GrRedisResponse = 'gr.api.redis.response.time'
 
     def wfDirectSenderSingleMetric(wfMetricName, wfMetricSourceName, metricValue):
         body = wfMetricName + ' ' + str(metricValue) + ' source=' + wfMetricSourceName
@@ -93,22 +93,31 @@ def client(data, host, port):
         sock.close()
 
     # ------- WAVEFRONT ACTION => Inject Data ---------
-    wfDirectSenderSingleMetric(wfMetricName_GrCntrlr, wfMetricSourceName_GrApiResponse, time.time() - start_time)
+    wfDirectSenderSingleMetric(wfMetricName_GrCntrlr, wfMetricSourceName_GrApi, time.time() - start_time)
 
     return payload
 
+# /version
 class MyVersion():
     def GET(self):
+
+        # ------- WAVEFRONT ACTION => Inject Data ---------
+        wfDirectSenderSingleMetric('gr.api.request.version', wfMetricSourceName_GrApi, 1)
 
         web.header('Content-Type', 'application/json')
         result = dict(version=_VERSION_,build=_BUILD_)
         return json.dumps(result, indent=4) + "\n"
 
 
+# /controllers/ids
 class ControllerIDs():
     def GET(self):
         ids = []
         global registry
+
+        # ------- WAVEFRONT ACTION => Inject Data ---------
+        wfDirectSenderSingleMetric('gr.api.request.controllers.ids', wfMetricSourceName_GrApi, 1)
+
         registry = redis.Redis(host=_RHOST_, port=_RPORT_, db=0, decode_responses=True)
 
         ididx = registry.zrange("ididx", 0, -1)
@@ -121,11 +130,15 @@ class ControllerIDs():
         return json.dumps(result, indent=4) + "\n"
 
 
+# /controllers
 class Controllers():
     def GET(self):
         controllers = []
-
         global registry
+
+        # ------- WAVEFRONT ACTION => Inject Data ---------
+        wfDirectSenderSingleMetric('gr.api.request.controllers', wfMetricSourceName_GrApi, 1)
+
         registry = redis.Redis(host=_RHOST_, port=_RPORT_, db=0, decode_responses=True)
 
         ididx = registry.zrange("ididx", 0, -1)
@@ -139,11 +152,15 @@ class Controllers():
         return json.dumps(result, indent=4) + "\n"
 
 
+# /controllers/{id}
 class Controller():
     def GET(self, id):
         i = int(id)
-
         global registry
+
+        # ------- WAVEFRONT ACTION => Inject Data ---------
+        wfDirectSenderSingleMetric('gr.api.request.controllers.id', wfMetricSourceName_GrApi, 1)
+
         registry = redis.Redis(host=_RHOST_, port=_RPORT_, db=0, decode_responses=True)
 
         name = registry.zrangebyscore("ididx", i, i)
@@ -158,8 +175,12 @@ class Controller():
         return json.dumps(result, indent=4) + "\n"
 
 
+# /controllers/register
 class Register():
     def POST(self):
+        # ------- WAVEFRONT ACTION => Inject Data ---------
+        wfDirectSenderSingleMetric('gr.api.request.controllers.register', wfMetricSourceName_GrApi, 1)
+
         inputs = web.input()
 
         if not "name" in inputs:
@@ -219,11 +240,15 @@ class Register():
             web.webapi.internalerror(message="Invalid response from remote controller {}.".format(inputs.host))
 
 
+# /controllers/{id}/unregister
 class Unregister():
     def POST(self, id):
         i = int(id)
-
         global registry
+
+        # ------- WAVEFRONT ACTION => Inject Data ---------
+        wfDirectSenderSingleMetric('gr.api.request.controllers.unregister', wfMetricSourceName_GrApi, 1)
+
         registry = redis.Redis(host=_RHOST_, port=_RPORT_, db=0, decode_responses=True)
 
         name = registry.zrangebyscore("ididx", i, i)
@@ -237,11 +262,15 @@ class Unregister():
         web.webapi.ok()
 
 
+# /controllers/{id}/settings
 class Settings():
     def GET(self, id):
         i = int(id)
-
         global registry
+
+        # ------- WAVEFRONT ACTION => Inject Data ---------
+        wfDirectSenderSingleMetric('gr.api.request.controllers.settings', wfMetricSourceName_GrApi, 1)
+
         registry = redis.Redis(host=_RHOST_, port=_RPORT_, db=0, decode_responses=True)
 
         name = registry.zrangebyscore("ididx", i, i)
@@ -259,11 +288,15 @@ class Settings():
         return json.dumps(result, indent=4) + "\n"
 
 
+# /controllers/{id}/{setting-name}
 class SettingName():
     def GET(self, id, setting):
         i = int(id)
-
         global registry
+
+        # ------- WAVEFRONT ACTION => Inject Data ---------
+        wfDirectSenderSingleMetric('gr.api.request.controllers.setting.get', wfMetricSourceName_GrApi, 1)
+
         registry = redis.Redis(host=_RHOST_, port=_RPORT_, db=0, decode_responses=True)
 
         name = registry.zrangebyscore("ididx", i, i)
@@ -294,8 +327,11 @@ class SettingName():
 
     def POST(self, id, setting):
         i = int(id)
-
         global registry
+
+        # ------- WAVEFRONT ACTION => Inject Data ---------
+        wfDirectSenderSingleMetric('gr.api.request.controllers.setting.post', wfMetricSourceName_GrApi, 1)
+
         registry = redis.Redis(host=_RHOST_, port=_RPORT_, db=0, decode_responses=True)
 
         name = registry.zrangebyscore("ididx", i, i)
@@ -334,11 +370,15 @@ class SettingName():
         web.webapi.ok()
 
 
+# /controllers/{id}/save
 class Save():
     def POST(self, id):
         i = int(id)
-
         global registry
+
+        # ------- WAVEFRONT ACTION => Inject Data ---------
+        wfDirectSenderSingleMetric('gr.api.request.controllers.save', wfMetricSourceName_GrApi, 1)
+
         registry = redis.Redis(host=_RHOST_, port=_RPORT_, db=0, decode_responses=True)
 
         name = registry.zrangebyscore("ididx", i, i)
@@ -353,11 +393,15 @@ class Save():
         web.webapi.ok()
 
 
+# /controllers/{id}/shutdown
 class Shutdown():
     def POST(self, id):
         i = int(id)
-
         global registry
+
+        # ------- WAVEFRONT ACTION => Inject Data ---------
+        wfDirectSenderSingleMetric('gr.api.request.controllers.shutdown', wfMetricSourceName_GrApi, 1)
+
         registry = redis.Redis(host=_RHOST_, port=_RPORT_, db=0, decode_responses=True)
 
         name = registry.zrangebyscore("ididx", i, i)
@@ -373,11 +417,16 @@ class Shutdown():
 
         web.webapi.ok()
 
+
+# /controllers/{id}/status
 class Status():
     def GET(self, id):
         i = int(id)
-
         global registry
+
+        # ------- WAVEFRONT ACTION => Inject Data ---------
+        wfDirectSenderSingleMetric('gr.api.request.controllers.status', wfMetricSourceName_GrApi, 1)
+
         registry = redis.Redis(host=_RHOST_, port=_RPORT_, db=0, decode_responses=True)
 
         name = registry.zrangebyscore("ididx", i, i)
@@ -395,11 +444,15 @@ class Status():
         return json.dumps(result, indent=4) + "\n"
 
 
+# /controllers/{id}/temp
 class Temp():
     def GET(self, id):
         i = int(id)
-
         global registry
+
+        # ------- WAVEFRONT ACTION => Inject Data ---------
+        wfDirectSenderSingleMetric('gr.api.request.controllers.temp', wfMetricSourceName_GrApi, 1)
+
         registry = redis.Redis(host=_RHOST_, port=_RPORT_, db=0, decode_responses=True)
 
         name = registry.zrangebyscore("ididx", i, i)
@@ -417,11 +470,15 @@ class Temp():
         return json.dumps(result, indent=4) + "\n"
 
 
+# /controllers/{id}/version
 class Version():
     def GET(self, id):
         i = int(id)
-
         global registry
+
+        # ------- WAVEFRONT ACTION => Inject Data ---------
+        wfDirectSenderSingleMetric('gr.api.request.controllers.version', wfMetricSourceName_GrApi, 1)
+
         registry = redis.Redis(host=_RHOST_, port=_RPORT_, db=0, decode_responses=True)
 
         name = registry.zrangebyscore("ididx", i, i)

@@ -10,7 +10,7 @@ import redis
 import wavefront_api_client as wf_api
 
 # Current self
-_VERSION_ = "1.6.1"
+_VERSION_ = "1.6.2"
 
 # Build num
 _BUILD_ = os.getenv("GR_API_BUILD", "X.xxx")
@@ -21,8 +21,9 @@ _RHOST_ = os.getenv("GR_REDIS_HOST", "grredis.greenroom.svc.cluster.local")
 # Redis Port
 _RPORT_ = os.getenv("GR_REDIS_PORT", "6379")
 
-# WAVEFRONT TOKEN
+# WAVEFRONT
 _WFTOKEN_ = os.getenv("GR_WAVEFRONT_TOKEN", "Disabled")
+_WF_SRC_ = os.getenv("GR_WAVEFRONT_SRC", "test")
 
 registry = redis.Redis(host=_RHOST_, port=_RPORT_, db=0, decode_responses=True)
 
@@ -53,10 +54,7 @@ if _WFTOKEN_ != "Disabled":
 
     wfApiInstance = wf_api.DirectIngestionApi(wf_api.ApiClient(wfConfig))
     wfDataFormat = 'wavefront'
-    wfMetricSourceName_GrApi = 'gr.api.test'
-
-    wfMetricName_GrCntrlrResponse = 'gr.api.cntrlr.response.time'
-    wfMetricName_GrRedisResponse = 'gr.api.redis.response.time'
+    wfMetricSourceName_GrApi = "gr.api." + _WF_SRC_
 
     def wfDirectSenderSingleMetric(wfMetricName, wfMetricSourceName, metricValue):
         body = wfMetricName + ' ' + str(metricValue) + ' source=' + wfMetricSourceName
@@ -94,7 +92,7 @@ def client(data, host, port):
 
     # ------- WAVEFRONT ACTION => Inject Data ---------
     if _WFTOKEN_ != "Disabled":
-        wfDirectSenderSingleMetric(wfMetricName_GrCntrlrResponse, wfMetricSourceName_GrApi, time.time() - start_time)
+        wfDirectSenderSingleMetric('gr.api.cntrlr.response.time', wfMetricSourceName_GrApi, time.time() - start_time)
 
     return payload
 
@@ -121,12 +119,18 @@ class ControllerIDs():
         if _WFTOKEN_ != "Disabled":
             wfDirectSenderSingleMetric('gr.api.request.controllers.ids', wfMetricSourceName_GrApi, 1)
 
+        start_time = time.time()
+
         registry = redis.Redis(host=_RHOST_, port=_RPORT_, db=0, decode_responses=True)
 
         ididx = registry.zrange("ididx", 0, -1)
         for name in ididx:
             id = int(registry.zscore("ididx", name))
             ids.append(id)
+
+        # ------- WAVEFRONT ACTION => Inject Data ---------
+        if _WFTOKEN_ != "Disabled":
+            wfDirectSenderSingleMetric('gr.api.redis.response.time', wfMetricSourceName_GrApi, time.time() - start_time)
 
         web.header('Content-Type', 'application/json')
         result = {'controllers': ids}
@@ -143,6 +147,8 @@ class Controllers():
         if _WFTOKEN_ != "Disabled":
             wfDirectSenderSingleMetric('gr.api.request.controllers', wfMetricSourceName_GrApi, 1)
 
+        start_time = time.time()
+
         registry = redis.Redis(host=_RHOST_, port=_RPORT_, db=0, decode_responses=True)
 
         ididx = registry.zrange("ididx", 0, -1)
@@ -150,6 +156,10 @@ class Controllers():
         for name in ididx:
             controller = registry.hgetall(name)
             controllers.append(controller)
+
+        # ------- WAVEFRONT ACTION => Inject Data ---------
+        if _WFTOKEN_ != "Disabled":
+            wfDirectSenderSingleMetric('gr.api.redis.response.time', wfMetricSourceName_GrApi, time.time() - start_time)
 
         web.header('Content-Type', 'application/json')
         result = {'data': [controllers]}
@@ -166,6 +176,8 @@ class Controller():
         if _WFTOKEN_ != "Disabled":
             wfDirectSenderSingleMetric('gr.api.request.controllers.id', wfMetricSourceName_GrApi, 1)
 
+        start_time = time.time()
+
         registry = redis.Redis(host=_RHOST_, port=_RPORT_, db=0, decode_responses=True)
 
         name = registry.zrangebyscore("ididx", i, i)
@@ -175,6 +187,10 @@ class Controller():
 
         controller = registry.hgetall(name[0])
 
+        # ------- WAVEFRONT ACTION => Inject Data ---------
+        if _WFTOKEN_ != "Disabled":
+            wfDirectSenderSingleMetric('gr.api.redis.response.time', wfMetricSourceName_GrApi, time.time() - start_time)
+
         web.header('Content-Type', 'application/json')
         result = {'data': [controller]}
         return json.dumps(result, indent=4) + "\n"
@@ -183,6 +199,8 @@ class Controller():
 # /controllers/register
 class Register():
     def POST(self):
+        global registry
+
         # ------- WAVEFRONT ACTION => Inject Data ---------
         if _WFTOKEN_ != "Disabled":
             wfDirectSenderSingleMetric('gr.api.request.controllers.register', wfMetricSourceName_GrApi, 1)
@@ -211,10 +229,16 @@ class Register():
             web.webapi.badrequest(message="Must supply port parameter.")
             return
 
-        global registry
+        start_time = time.time()
+
         registry = redis.Redis(host=_RHOST_, port=_RPORT_, db=0, decode_responses=True)
 
         ididx = registry.zrange("ididx", 0, -1)
+
+        # ------- WAVEFRONT ACTION => Inject Data ---------
+        if _WFTOKEN_ != "Disabled":
+            wfDirectSenderSingleMetric('gr.api.redis.response.time', wfMetricSourceName_GrApi, time.time() - start_time)
+
         if ididx:
             if len(ididx) >= 1 and inputs.name in ididx:
                 web.webapi.conflict(message="Name already exists.")
@@ -224,6 +248,8 @@ class Register():
         string = result.split("\n")
 
         if string[0] == "version" and len(string[1]) > 0:
+            start_time = time.time()
+
             if not registry.exists("ididx"):
                 mapping = {inputs.name:'0'}
                 registry.zadd("ididx", mapping, nx=True, xx=False, ch=False, incr=False)
@@ -238,6 +264,10 @@ class Register():
             mapping = {'name':inputs.name, 'host':inputs.host, 'port':inputs.port, 'type':inputs.type, 'capability':inputs.capability, 'vendor':inputs.vendor, 'model':inputs.model}
             registry.hmset(inputs.name, mapping)
             registry.persist(inputs.name)
+
+            # ------- WAVEFRONT ACTION => Inject Data ---------
+            if _WFTOKEN_ != "Disabled":
+                wfDirectSenderSingleMetric('gr.api.redis.response.time', wfMetricSourceName_GrApi, time.time() - start_time)
 
             web.header('Content-Type', 'application/json')
             result = {'data': [dict(zip(tuple([string[0]]),[string[1]]))]}
@@ -256,15 +286,25 @@ class Unregister():
         if _WFTOKEN_ != "Disabled":
             wfDirectSenderSingleMetric('gr.api.request.controllers.unregister', wfMetricSourceName_GrApi, 1)
 
+        start_time = time.time()
+
         registry = redis.Redis(host=_RHOST_, port=_RPORT_, db=0, decode_responses=True)
 
         name = registry.zrangebyscore("ididx", i, i)
         if len(name) == 0:
+            # ------- WAVEFRONT ACTION => Inject Data ---------
+            if _WFTOKEN_ != "Disabled":
+                wfDirectSenderSingleMetric('gr.api.redis.response.time', wfMetricSourceName_GrApi, time.time() - start_time)
+
             web.notfound()
             return
 
         result = registry.zremrangebyscore("ididx", i, i)
         result = registry.delete(name[0])
+
+        # ------- WAVEFRONT ACTION => Inject Data ---------
+        if _WFTOKEN_ != "Disabled":
+            wfDirectSenderSingleMetric('gr.api.redis.response.time', wfMetricSourceName_GrApi, time.time() - start_time)
 
         web.webapi.ok()
 
@@ -279,6 +319,8 @@ class Settings():
         if _WFTOKEN_ != "Disabled":
             wfDirectSenderSingleMetric('gr.api.request.controllers.settings', wfMetricSourceName_GrApi, 1)
 
+        start_time = time.time()
+
         registry = redis.Redis(host=_RHOST_, port=_RPORT_, db=0, decode_responses=True)
 
         name = registry.zrangebyscore("ididx", i, i)
@@ -287,6 +329,10 @@ class Settings():
             return
 
         controller = registry.hgetall(name[0])
+
+        # ------- WAVEFRONT ACTION => Inject Data ---------
+        if _WFTOKEN_ != "Disabled":
+            wfDirectSenderSingleMetric('gr.api.redis.response.time', wfMetricSourceName_GrApi, time.time() - start_time)
 
         result = client("GET SETTINGS", controller['host'], controller['port'])
         string = result.split("\n")
@@ -306,6 +352,8 @@ class SettingName():
         if _WFTOKEN_ != "Disabled":
             wfDirectSenderSingleMetric('gr.api.request.controllers.setting.get', wfMetricSourceName_GrApi, 1)
 
+        start_time = time.time()
+
         registry = redis.Redis(host=_RHOST_, port=_RPORT_, db=0, decode_responses=True)
 
         name = registry.zrangebyscore("ididx", i, i)
@@ -314,6 +362,10 @@ class SettingName():
             return
 
         controller = registry.hgetall(name[0])
+
+        # ------- WAVEFRONT ACTION => Inject Data ---------
+        if _WFTOKEN_ != "Disabled":
+            wfDirectSenderSingleMetric('gr.api.redis.response.time', wfMetricSourceName_GrApi, time.time() - start_time)
 
         result = client("GET SETTINGS", controller['host'], controller['port'])
         string = result.split("\n")
@@ -342,14 +394,25 @@ class SettingName():
         if _WFTOKEN_ != "Disabled":
             wfDirectSenderSingleMetric('gr.api.request.controllers.setting.post', wfMetricSourceName_GrApi, 1)
 
+        start_time = time.time()
+
         registry = redis.Redis(host=_RHOST_, port=_RPORT_, db=0, decode_responses=True)
 
         name = registry.zrangebyscore("ididx", i, i)
+
         if len(name) == 0:
+            # ------- WAVEFRONT ACTION => Inject Data ---------
+            if _WFTOKEN_ != "Disabled":
+                wfDirectSenderSingleMetric('gr.api.redis.response.time', wfMetricSourceName_GrApi, time.time() - start_time)
+
             web.notfound()
             return
 
         controller = registry.hgetall(name[0])
+
+        # ------- WAVEFRONT ACTION => Inject Data ---------
+        if _WFTOKEN_ != "Disabled":
+            wfDirectSenderSingleMetric('gr.api.redis.response.time', wfMetricSourceName_GrApi, time.time() - start_time)
 
         inputs = web.input()
         if not "setTo" in inputs:
@@ -390,6 +453,8 @@ class Save():
         if _WFTOKEN_ != "Disabled":
             wfDirectSenderSingleMetric('gr.api.request.controllers.save', wfMetricSourceName_GrApi, 1)
 
+        start_time = time.time()
+
         registry = redis.Redis(host=_RHOST_, port=_RPORT_, db=0, decode_responses=True)
 
         name = registry.zrangebyscore("ididx", i, i)
@@ -398,6 +463,10 @@ class Save():
             return
 
         controller = registry.hgetall(name[0])
+
+        # ------- WAVEFRONT ACTION => Inject Data ---------
+        if _WFTOKEN_ != "Disabled":
+            wfDirectSenderSingleMetric('gr.api.redis.response.time', wfMetricSourceName_GrApi, time.time() - start_time)
 
         result = client("SAVE", controller['host'], controller['port'])
 
@@ -409,6 +478,8 @@ class Shutdown():
     def POST(self, id):
         i = int(id)
         global registry
+
+        start_time = time.time()
 
         # ------- WAVEFRONT ACTION => Inject Data ---------
         if _WFTOKEN_ != "Disabled":
@@ -423,9 +494,14 @@ class Shutdown():
 
         controller = registry.hgetall(name[0])
 
-        result = client("SHUTDOWN", controller['host'], controller['port'])
         result = registry.zremrangebyscore("ididx", i, i)
         result = registry.delete(name[0])
+
+        # ------- WAVEFRONT ACTION => Inject Data ---------
+        if _WFTOKEN_ != "Disabled":
+            wfDirectSenderSingleMetric('gr.api.redis.response.time', wfMetricSourceName_GrApi, time.time() - start_time)
+
+        result = client("SHUTDOWN", controller['host'], controller['port'])
 
         web.webapi.ok()
 
@@ -440,6 +516,8 @@ class Status():
         if _WFTOKEN_ != "Disabled":
             wfDirectSenderSingleMetric('gr.api.request.controllers.status', wfMetricSourceName_GrApi, 1)
 
+        start_time = time.time()
+
         registry = redis.Redis(host=_RHOST_, port=_RPORT_, db=0, decode_responses=True)
 
         name = registry.zrangebyscore("ididx", i, i)
@@ -448,6 +526,10 @@ class Status():
             return
 
         controller = registry.hgetall(name[0])
+
+        # ------- WAVEFRONT ACTION => Inject Data ---------
+        if _WFTOKEN_ != "Disabled":
+            wfDirectSenderSingleMetric('gr.api.redis.response.time', wfMetricSourceName_GrApi, time.time() - start_time)
 
         result = client("GET STATUS", controller['host'], controller['port'])
         string = result.split("\n")
@@ -467,6 +549,8 @@ class Temp():
         if _WFTOKEN_ != "Disabled":
             wfDirectSenderSingleMetric('gr.api.request.controllers.temp', wfMetricSourceName_GrApi, 1)
 
+        start_time = time.time()
+
         registry = redis.Redis(host=_RHOST_, port=_RPORT_, db=0, decode_responses=True)
 
         name = registry.zrangebyscore("ididx", i, i)
@@ -475,6 +559,10 @@ class Temp():
             return
 
         controller = registry.hgetall(name[0])
+
+        # ------- WAVEFRONT ACTION => Inject Data ---------
+        if _WFTOKEN_ != "Disabled":
+            wfDirectSenderSingleMetric('gr.api.redis.response.time', wfMetricSourceName_GrApi, time.time() - start_time)
 
         result = client("\n", controller['host'], controller['port'])
         string = result.split("\n")
@@ -494,6 +582,8 @@ class Version():
         if _WFTOKEN_ != "Disabled":
             wfDirectSenderSingleMetric('gr.api.request.controllers.version', wfMetricSourceName_GrApi, 1)
 
+        start_time = time.time()
+
         registry = redis.Redis(host=_RHOST_, port=_RPORT_, db=0, decode_responses=True)
 
         name = registry.zrangebyscore("ididx", i, i)
@@ -502,6 +592,10 @@ class Version():
             return
 
         controller = registry.hgetall(name[0])
+
+        # ------- WAVEFRONT ACTION => Inject Data ---------
+        if _WFTOKEN_ != "Disabled":
+            wfDirectSenderSingleMetric('gr.api.redis.response.time', wfMetricSourceName_GrApi, time.time() - start_time)
 
         result = client("GET VERSION\n", controller['host'], controller['port'])
         string = result.split("\n")

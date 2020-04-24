@@ -10,7 +10,7 @@ import redis
 import wavefront_api_client as wf_api
 
 # Current self
-_VERSION_ = "1.7.3"
+_VERSION_ = "1.7.2"
 
 # Build num
 _BUILD_ = os.getenv("GR_API_BUILD", "X.xxx")
